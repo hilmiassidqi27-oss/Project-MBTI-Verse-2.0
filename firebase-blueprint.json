@@ -1,0 +1,24 @@
+{
+  "entities": {
+    "submissions": {
+      "title": "Submissions",
+      "description": "Candidate assessment submissions with calculated MBTI result profiles",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique identifier for the submission" },
+        "user": { "type": "object", "description": "Candidate profile data" },
+        "result": { "type": "object", "description": "MBTI outcome and dimension scores" },
+        "answers": { "type": "object", "description": "Question choices dictionary" },
+        "createdAt": { "type": "string", "description": "Date formatted string" },
+        "timestamp": { "type": "number", "description": "Timestamp in milliseconds" }
+      },
+      "required": ["id", "user", "result", "timestamp"]
+    }
+  },
+  "firestore": {
+    "submissions": {
+      "entity": "submissions",
+      "description": "All assessment records synced across candidate mobile devices and admin dashboards"
+    }
+  }
+}

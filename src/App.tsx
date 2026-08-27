@@ -6,6 +6,7 @@ import { getStoredSubmissions, saveSubmission } from './utils/storage';
 import {
   isFirebaseConfigured,
   subscribeToFirestoreSubmissions,
+  saveSubmissionToFirestore,
   getActiveAdminSession,
   logoutAdmin,
   AdminSession
@@ -45,8 +46,19 @@ export function App() {
     // Subscribe to Firestore if configured
     if (isFirebaseConfigured()) {
       const unsub = subscribeToFirestoreSubmissions(cloudRecords => {
-        if (cloudRecords.length > 0) {
+        if (cloudRecords && cloudRecords.length > 0) {
           setSubmissions(cloudRecords);
+          try {
+            localStorage.setItem('mbti_industrial_submissions_v1', JSON.stringify(cloudRecords));
+          } catch {}
+        } else {
+          // If Firestore is empty on fresh database setup, sync existing local records to Firestore
+          const localRecords = getStoredSubmissions();
+          if (localRecords.length > 0) {
+            localRecords.forEach(rec => {
+              saveSubmissionToFirestore(rec);
+            });
+          }
         }
       });
       return () => unsub();
@@ -247,9 +259,10 @@ export function App() {
 
         {currentView === 'completion' && (
           <CompletionScreen
-            onComplete={handleCompletionDone}
+            onStartNew={handleStartFresh}
             candidateName={currentUser?.fullName || 'Kandidat'}
             isDarkMode={isDarkMode}
+            submissionId={currentSubmissionId}
           />
         )}
 

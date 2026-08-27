@@ -132,6 +132,65 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Quick Fill Credentials Helper */}
+          <div className={`p-3 rounded-xl border text-xs ${
+            isDarkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-slate-50 border-slate-200'
+          }`}>
+            <div className="text-[11px] font-semibold text-indigo-400 mb-2 flex items-center justify-between">
+              <span>PILIH AKUN ADMINISTRATOR / DEMO:</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('admin@mbti-industrial.com');
+                  setPassword('admin123');
+                }}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
+                  email === 'admin@mbti-industrial.com'
+                    ? 'bg-indigo-600 text-white border-indigo-500'
+                    : isDarkMode
+                    ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                    : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                Super Admin (admin@mbti-industrial.com)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('hilmiassidqi27@gmail.com');
+                  setPassword('admin123');
+                }}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
+                  email === 'hilmiassidqi27@gmail.com'
+                    ? 'bg-indigo-600 text-white border-indigo-500'
+                    : isDarkMode
+                    ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                    : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                Lead Admin (hilmiassidqi27@gmail.com)
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('hrd.recruitment@apex-ind.com');
+                  setPassword('hrd12345');
+                }}
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
+                  email === 'hrd.recruitment@apex-ind.com'
+                    ? 'bg-indigo-600 text-white border-indigo-500'
+                    : isDarkMode
+                    ? 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+                    : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
+                }`}
+              >
+                HR Specialist (hrd.recruitment@apex-ind.com)
+              </button>
+            </div>
+          </div>
+
           {/* Email */}
           <div>
             <label className={`block text-xs font-label-caps font-semibold uppercase mb-1.5 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>

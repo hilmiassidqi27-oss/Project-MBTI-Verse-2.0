@@ -1,62 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { Brain, CheckCircle2, ShieldCheck, Activity, Cpu, ArrowRight } from 'lucide-react';
+import React from 'react';
+import { CheckCircle2, ShieldCheck, FileCheck, ArrowRight, UserCheck, Lock } from 'lucide-react';
 import { motion } from 'motion/react';
 
 interface CompletionScreenProps {
-  onComplete: () => void;
+  onStartNew: () => void;
   candidateName: string;
   isDarkMode: boolean;
+  submissionId?: string;
 }
 
 export const CompletionScreen: React.FC<CompletionScreenProps> = ({
-  onComplete,
+  onStartNew,
   candidateName,
-  isDarkMode
+  isDarkMode,
+  submissionId
 }) => {
-  const [progress, setProgress] = useState<number>(10);
-  const [currentStage, setCurrentStage] = useState<number>(0);
-
-  const stages = [
-    { label: 'Mengumpulkan 24 respons skenario operasional...', icon: Activity },
-    { label: 'Menghitung rasio 4 sumbu psikometrik (E/I, S/N, T/F, J/P)...', icon: Brain },
-    { label: 'Memetakan kecocokan HSE, tanggap krisis, & kompetensi lapangan...', icon: ShieldCheck },
-    { label: 'Menyimpan profil submisi dan memfinalisasi laporan...', icon: Cpu }
-  ];
-
-  useEffect(() => {
-    const timer1 = setTimeout(() => {
-      setProgress(40);
-      setCurrentStage(1);
-    }, 450);
-
-    const timer2 = setTimeout(() => {
-      setProgress(75);
-      setCurrentStage(2);
-    }, 900);
-
-    const timer3 = setTimeout(() => {
-      setProgress(98);
-      setCurrentStage(3);
-    }, 1400);
-
-    const timer4 = setTimeout(() => {
-      setProgress(100);
-      onComplete();
-    }, 1900);
-
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      clearTimeout(timer4);
-    };
-  }, [onComplete]);
-
   return (
-    <div className="w-full max-w-xl mx-auto pt-32 pb-20 px-4 flex flex-col items-center justify-center text-center min-h-[70vh]">
+    <div className="w-full max-w-xl mx-auto pt-28 pb-20 px-4 flex flex-col items-center justify-center text-center min-h-[75vh]">
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.4 }}
         className={`w-full p-8 sm:p-10 rounded-2xl border transition-all shadow-2xl relative overflow-hidden ${
           isDarkMode
             ? 'bg-[#111b34] border-slate-800 text-slate-100'
@@ -65,85 +29,69 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
       >
         {/* Glow Accent */}
         <div
-          className={`absolute -top-20 -right-20 w-52 h-52 rounded-full blur-3xl pointer-events-none opacity-40 ${
-            isDarkMode ? 'bg-indigo-600' : 'bg-indigo-300'
+          className={`absolute -top-20 -right-20 w-52 h-52 rounded-full blur-3xl pointer-events-none opacity-30 ${
+            isDarkMode ? 'bg-emerald-600' : 'bg-emerald-300'
           }`}
         />
 
-        {/* Brain/CPU Icon Pulse */}
-        <div className="relative mx-auto w-16 h-16 mb-6 flex items-center justify-center">
-          <div className="absolute inset-0 rounded-2xl bg-indigo-500/20 animate-ping opacity-60" />
-          <div className="relative w-16 h-16 rounded-2xl bg-indigo-600 border border-indigo-400/40 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
-            <Brain className="w-8 h-8 animate-pulse" />
+        {/* Success Icon Badge */}
+        <div className="relative mx-auto w-18 h-18 mb-6 flex items-center justify-center">
+          <div className="absolute inset-0 rounded-full bg-emerald-500/20 animate-ping opacity-50" />
+          <div className="relative w-16 h-16 rounded-full bg-emerald-500/10 border-2 border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-lg shadow-emerald-500/20">
+            <CheckCircle2 className="w-9 h-9 text-emerald-400" />
           </div>
         </div>
 
-        <div className="font-data-mono text-xs text-indigo-400 font-semibold tracking-widest uppercase mb-1">
-          DIAGNOSTIK PSIKOMETRI SELESAI
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wider uppercase mb-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>Asesmen Berhasil Dikirim</span>
         </div>
 
         <h2 className="text-xl sm:text-2xl font-bold mb-2">
-          Memproses Hasil Asesmen
+          Terima Kasih, {candidateName}!
         </h2>
-        <p className={`text-xs sm:text-sm mb-6 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-          Kandidat: <span className="font-semibold text-indigo-400">{candidateName}</span>
+
+        <p className={`text-xs sm:text-sm leading-relaxed mb-6 ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+          Jawaban asesmen psikometrik Anda telah tersimpan secara aman ke dalam sistem database seleksi & rekrutmen perusahaan.
         </p>
 
-        {/* Progress Bar */}
-        <div className="w-full bg-slate-800/80 h-2.5 rounded-full overflow-hidden mb-6 p-0.5 border border-slate-700/60">
-          <motion.div
-            className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full"
-            style={{ width: `${progress}%` }}
-            transition={{ ease: 'easeOut', duration: 0.3 }}
-          />
+        {/* Confidential Notice Card */}
+        <div className={`p-4 rounded-xl border text-left mb-6 space-y-2.5 text-xs ${
+          isDarkMode ? 'bg-slate-900/70 border-slate-800' : 'bg-slate-50 border-slate-200'
+        }`}>
+          <div className="flex items-center gap-2 font-semibold text-slate-200">
+            <Lock className="w-4 h-4 text-indigo-400 shrink-0" />
+            <span className={isDarkMode ? 'text-slate-200' : 'text-slate-800'}>Kerahasiaan Hasil Asesmen</span>
+          </div>
+          <p className={isDarkMode ? 'text-slate-400 leading-relaxed' : 'text-slate-600 leading-relaxed'}>
+            Sesuai kebijakan evaluasi psikometrik kerja internal, skor dan analisis detail profil kepribadian akan dievaluasi langsung oleh tim <strong>HRD & Penguji Kompetensi Lapangan</strong>.
+          </p>
+          {submissionId && (
+            <div className="pt-2 border-t border-slate-700/50 flex items-center justify-between text-[11px]">
+              <span className="text-slate-400">Kode Registrasi Submisi:</span>
+              <span className="font-mono font-bold text-indigo-400">{submissionId}</span>
+            </div>
+          )}
         </div>
 
-        {/* Step Items */}
-        <div className="space-y-3 text-left mb-6">
-          {stages.map((stage, idx) => {
-            const Icon = stage.icon;
-            const isFinished = idx < currentStage;
-            const isCurrent = idx === currentStage;
-
-            return (
-              <div
-                key={idx}
-                className={`flex items-center gap-3 p-2.5 rounded-lg border text-xs transition-all ${
-                  isFinished
-                    ? isDarkMode
-                      ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-300'
-                      : 'bg-emerald-50 border-emerald-200 text-emerald-700'
-                    : isCurrent
-                    ? isDarkMode
-                      ? 'bg-indigo-950/40 border-indigo-500/40 text-indigo-300 animate-pulse'
-                      : 'bg-indigo-50 border-indigo-200 text-indigo-700'
-                    : isDarkMode
-                    ? 'border-transparent text-slate-500'
-                    : 'border-transparent text-slate-400'
-                }`}
-              >
-                {isFinished ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                ) : (
-                  <Icon className={`w-4 h-4 shrink-0 ${isCurrent ? 'text-indigo-400' : 'text-slate-500'}`} />
-                )}
-                <span className="font-medium truncate">{stage.label}</span>
-              </div>
-            );
-          })}
+        {/* Next Steps Guide */}
+        <div className={`p-3.5 rounded-xl border text-left mb-6 text-xs flex items-start gap-3 ${
+          isDarkMode ? 'bg-indigo-950/20 border-indigo-500/30 text-indigo-300' : 'bg-indigo-50 border-indigo-200 text-indigo-800'
+        }`}>
+          <UserCheck className="w-4 h-4 shrink-0 mt-0.5" />
+          <div className="leading-snug">
+            <span className="font-semibold block mb-0.5">Langkah Selanjutnya:</span>
+            Silakan konfirmasi ke tim HR atau pengawas lapangan bahwa Anda telah menyelesaikan tes ini.
+          </div>
         </div>
 
-        {/* Instant Skip Button */}
+        {/* Button to Finish / Reset for Next Candidate */}
         <button
-          onClick={onComplete}
-          className={`w-full py-2.5 px-4 rounded-xl text-xs font-label-caps font-semibold uppercase tracking-wider flex items-center justify-center gap-2 border transition-all ${
-            isDarkMode
-              ? 'border-slate-700 hover:bg-slate-800 text-slate-300 hover:text-white'
-              : 'border-slate-300 hover:bg-slate-100 text-slate-700'
-          }`}
+          onClick={onStartNew}
+          className="w-full py-3 px-5 rounded-xl text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 transition-all"
         >
-          <span>Buka Laporan Lengkap</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          <FileCheck className="w-4 h-4" />
+          <span>Selesai / Mulai Asesmen Baru</span>
         </button>
       </motion.div>
     </div>
