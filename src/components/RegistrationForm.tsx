@@ -41,7 +41,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof UserProfile | 'customDept', string>> = {};
     if (!formData.fullName.trim()) newErrors.fullName = 'Nama lengkap wajib diisi';
-    if (!formData.nik.trim()) newErrors.nik = 'NIK / Nomor Induk wajib diisi';
+    if (!formData.nik.trim()) newErrors.nik = 'Nomor Induk Kependudukan (NIK) wajib diisi';
     if (!formData.position.trim()) newErrors.position = 'Jabatan / posisi kerja wajib diisi';
     
     if (selectedDeptOption === 'OTHER') {
@@ -222,16 +222,17 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
                   isDarkMode ? 'text-slate-300' : 'text-slate-700'
                 }`}
               >
-                NIK (Nomor Induk Karyawan)
+                NIK (Nomor Induk Kependudukan)
               </label>
               <div className="relative">
                 <BadgeCheck className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                 <input
                   id="input-nik"
                   type="text"
+                  maxLength={16}
                   value={formData.nik}
                   onChange={e => setFormData({ ...formData, nik: e.target.value })}
-                  placeholder="Contoh: EMP-10928"
+                  placeholder="Contoh: 3201xxxxxxxxxxxx (16 digit NIK)"
                   className={`w-full h-12 rounded-lg pl-10 pr-4 text-sm font-data-mono transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500/50 ${
                     isDarkMode
                       ? 'bg-[#0b1326] border border-slate-700 text-white placeholder:text-slate-500 focus:border-indigo-500'

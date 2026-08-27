@@ -65,7 +65,7 @@ export function exportResultToPDF(result: MBTIResult, user: UserProfile): void {
   doc.text(user.fullName, 52, currentY + 15);
 
   doc.setFont('helvetica', 'normal');
-  doc.text(`NIK / ID Pegawai : `, 20, currentY + 22);
+  doc.text(`NIK (Kependudukan) : `, 20, currentY + 22);
   doc.setFont('helvetica', 'bold');
   doc.text(user.nik, 52, currentY + 22);
 
