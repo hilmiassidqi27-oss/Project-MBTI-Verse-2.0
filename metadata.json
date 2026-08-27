@@ -1,6 +1,8 @@
 {
-  "name": "MBTI Industrial - Asesmen Kepribadian Pekerja Lapangan",
-  "description": "A high-performance industrial psychometric assessment platform and admin analytics dashboard for field workers.",
+  "name": "MBTI PT.DPP - Asesmen Kepribadian",
+  "description": "A high-performance industrial psychometric assessment platform and admin analytics dashboard.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }

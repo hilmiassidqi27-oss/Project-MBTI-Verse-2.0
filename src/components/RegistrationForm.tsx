@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserProfile } from '../types';
 import { INDUSTRIAL_DEPARTMENTS } from '../data/questions';
-import { User, BadgeCheck, Briefcase, Building2, Mail, ArrowRight, Activity, Sparkles, PlusCircle, MapPin } from 'lucide-react';
+import { User, BadgeCheck, Briefcase, Building2, Mail, ArrowRight, Activity, PlusCircle, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface RegistrationFormProps {
@@ -100,40 +100,6 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
     }
   };
 
-  const handleQuickFill = () => {
-    const demoUsers = [
-      {
-        fullName: 'Reza Pratama',
-        nik: 'EMP-99302',
-        position: 'Field Mechanical Engineer',
-        department: 'Engineering & Maintenance',
-        workArea: 'Plant Area / Processing Unit',
-        email: 'reza.pratama@apex-ind.com'
-      },
-      {
-        fullName: 'Dewi Anggraini',
-        nik: 'EMP-77114',
-        position: 'HSE Field Coordinator',
-        department: 'Health, Safety & Environment (HSE)',
-        workArea: 'Field / Area Lapangan Terbuka',
-        email: 'dewi.anggraini@apex-ind.com'
-      },
-      {
-        fullName: 'Agus Setiawan',
-        nik: 'EMP-88201',
-        position: 'Control Room SCADA Operator',
-        department: 'Instrumentation & SCADA',
-        workArea: 'Central Control Room (CCR)',
-        email: 'agus.setiawan@apex-ind.com'
-      }
-    ];
-    const chosen = demoUsers[Math.floor(Math.random() * demoUsers.length)];
-    setSelectedDeptOption(chosen.department);
-    setCustomDept('');
-    setFormData(chosen);
-    setErrors({});
-  };
-
   return (
     <div className="relative min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       {/* Industrial Background Ambient Layer with Hotlink */}
@@ -206,7 +172,7 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
               isDarkMode ? 'text-white' : 'text-slate-900'
             }`}
           >
-            Asesmen Kepribadian Pekerja Lapangan
+            Asesmen Kepribadian
           </h1>
           <p
             className={`text-sm sm:text-base max-w-[520px] mx-auto ${
@@ -215,23 +181,6 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
           >
             Temukan potensi dan gaya kerja Anda melalui asesmen berbasis skenario industri terkalibrasi.
           </p>
-
-          {/* Quick Demo Fill Button */}
-          <div className="mt-3 flex justify-center">
-            <button
-              type="button"
-              onClick={handleQuickFill}
-              id="quick-demo-fill-button"
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-data-mono transition-all border ${
-                isDarkMode
-                  ? 'bg-slate-800/80 border-slate-700 text-indigo-300 hover:bg-slate-700 hover:text-white'
-                  : 'bg-slate-100 border-slate-300 text-indigo-700 hover:bg-slate-200'
-              }`}
-            >
-              <Sparkles className="w-3 h-3" />
-              Isi Otomatis Data Sampel
-            </button>
-          </div>
         </div>
 
         {/* Assessment Entry Form */}

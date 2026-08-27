@@ -14,7 +14,6 @@ import {
   Trash2,
   Eye,
   PlusCircle,
-  Sparkles,
   ArrowUpDown,
   Filter,
   CheckCircle2,
@@ -188,52 +187,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
-  const handleSimulateRandomRecord = () => {
-    if (!permissions.canSimulateData) {
-      alert('Akses Ditolak: Fitur simulasi data hanya tersedia untuk Super Administrator.');
-      return;
-    }
-
-    const mockNames = [
-      { name: 'Riko Ramadhan', nik: 'EMP-41098', pos: 'Turbine Specialist', dept: 'Engineering & Maintenance', area: 'Workshop & Maintenance Yard' },
-      { name: 'Siti Nurhaliza', nik: 'EMP-66290', pos: 'Process Chemist', dept: 'Quality Assurance & Control (QA/QC)', area: 'Laboratorium & QC' },
-      { name: 'Anton Wijaya', nik: 'EMP-73912', pos: 'Electrical Engineer', dept: 'Electrical & Power Utilities', area: 'Substation & Power Station' },
-      { name: 'Mega Utami', nik: 'EMP-84511', pos: 'HSE Safety Auditor', dept: 'Health, Safety & Environment (HSE)', area: 'Field / Area Lapangan Terbuka' },
-      { name: 'Hendra Gunawan', nik: 'EMP-59281', pos: 'SCADA Programmer', dept: 'Instrumentation & SCADA', area: 'Central Control Room (CCR)' }
-    ];
-
-    const chosen = mockNames[Math.floor(Math.random() * mockNames.length)];
-    // Random answers
-    const mockAnswers: Record<number, number> = {};
-    for (let i = 1; i <= 24; i++) {
-      mockAnswers[i] = Math.floor(Math.random() * 5) + 1;
-    }
-
-    const mockResult = calculateMBTIResult(mockAnswers);
-    const newRecord = saveSubmission(
-      {
-        fullName: chosen.name,
-        nik: chosen.nik,
-        position: chosen.pos,
-        department: chosen.dept,
-        workArea: chosen.area,
-        email: `${chosen.name.toLowerCase().replace(/\s+/g, '.')}@apex-ind.com`
-      },
-      mockResult,
-      mockAnswers
-    );
-
-    onUpdateSubmissions([newRecord, ...submissions]);
-    if (adminSession?.email) {
-      addAuditLog(
-        adminSession.email,
-        'SIMULATE_DATA',
-        `Membuat data simulasi asesmen untuk ${chosen.name} (${chosen.dept})`,
-        'info'
-      );
-    }
-  };
-
   const handleExportExcel = () => {
     if (!permissions.canExportData) {
       alert('Akses Ditolak: Anda tidak memiliki izin ekspor data.');
@@ -308,22 +261,6 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {permissions.canSimulateData && (
-            <button
-              onClick={handleSimulateRandomRecord}
-              id="simulate-data-button"
-              className={`px-3 py-2 rounded-lg text-xs font-label-caps font-semibold uppercase tracking-wider flex items-center gap-1.5 border transition-all ${
-                isDarkMode
-                  ? 'border-slate-700 bg-slate-800/80 text-indigo-300 hover:bg-slate-700'
-                  : 'border-slate-300 bg-white text-indigo-700 hover:bg-slate-50'
-              }`}
-              title="Tambah 1 data simulasi tes otomatis"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Simulasi Data</span>
-            </button>
-          )}
-
           {permissions.canExportData && (
             <>
               <button

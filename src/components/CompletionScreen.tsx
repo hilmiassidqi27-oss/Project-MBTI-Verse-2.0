@@ -64,7 +64,7 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
             <span className={isDarkMode ? 'text-slate-200' : 'text-slate-800'}>Kerahasiaan Hasil Asesmen</span>
           </div>
           <p className={isDarkMode ? 'text-slate-400 leading-relaxed' : 'text-slate-600 leading-relaxed'}>
-            Sesuai kebijakan evaluasi psikometrik kerja internal, skor dan analisis detail profil kepribadian akan dievaluasi langsung oleh tim <strong>HRD & Penguji Kompetensi Lapangan</strong>.
+            Sesuai kebijakan evaluasi psikometrik kerja internal, skor dan analisis detail profil kepribadian akan dievaluasi langsung oleh tim <strong>HRD & Tim Penguji Kompetensi</strong>.
           </p>
           {submissionId && (
             <div className="pt-2 border-t border-slate-700/50 flex items-center justify-between text-[11px]">
@@ -81,7 +81,7 @@ export const CompletionScreen: React.FC<CompletionScreenProps> = ({
           <UserCheck className="w-4 h-4 shrink-0 mt-0.5" />
           <div className="leading-snug">
             <span className="font-semibold block mb-0.5">Langkah Selanjutnya:</span>
-            Silakan konfirmasi ke tim HR atau pengawas lapangan bahwa Anda telah menyelesaikan tes ini.
+            Silakan konfirmasi ke tim HR atau pengawas bahwa Anda telah menyelesaikan tes ini.
           </div>
         </div>
 

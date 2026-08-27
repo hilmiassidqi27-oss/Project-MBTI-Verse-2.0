@@ -23,13 +23,13 @@ export function exportResultToPDF(result: MBTIResult, user: UserProfile): void {
   // Brand Name & Tagline
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
-  doc.setFontSize(16);
-  doc.text('MBTI INDUSTRIAL // LAPORAN ASESMEN LAPANGAN', 14, 16);
+  doc.setFontSize(15);
+  doc.text('MBTI PT. DIAN PANDU PRATAMA // LAPORAN ASESMEN', 14, 16);
 
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
   doc.setTextColor(148, 163, 184); // Slate-400
-  doc.text('SISTEM EVALUASI PROFIL PSIKOMETRIK & KOMPETENSI OPERASIONAL', 14, 23);
+  doc.text('SISTEM EVALUASI PROFIL PSIKOMETRIK & KOMPETENSI KERJA', 14, 23);
 
   // Date in header
   const todayStr = new Date().toLocaleDateString('id-ID', {

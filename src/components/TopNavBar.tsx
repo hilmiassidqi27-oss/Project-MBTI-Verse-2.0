@@ -58,11 +58,11 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
               <Activity className="w-5 h-5" />
             </div>
             <div>
-              <div className={`font-bold tracking-tight text-lg leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                MBTI <span className={isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}>Industrial</span>
+              <div className={`font-bold tracking-tight text-base sm:text-lg leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                MBTI <span className={isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}>PT. Dian Pandu Pratama</span>
               </div>
               <div className="text-[10px] tracking-wider uppercase font-data-mono text-slate-400 leading-none">
-                Field Psychometrics
+                Asesmen Kepribadian
               </div>
             </div>
           </button>

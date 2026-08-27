@@ -233,124 +233,19 @@ export function addAuditLog(
 }
 
 
-const INITIAL_DEMO_SUBMISSIONS: SubmissionRecord[] = [
-  {
-    id: 'SUB-SAMPLE-1',
-    user: {
-      fullName: 'Dian Pandu Pratama',
-      nik: 'DPP-2024-001',
-      position: 'General Manager',
-      department: 'Corporate Management',
-      workArea: 'Central Office Hub',
-      email: 'dian.pandu@dianpandupratama.co.id'
-    },
-    result: {
-      code: 'ENTJ',
-      nickname: 'Komandan / Pemimpin Strategis',
-      profile: MBTI_PROFILES['ENTJ'],
-      dimensions: {
-        EI: { leftCode: 'E', rightCode: 'I', leftLabel: 'Ekstrovert (E)', rightLabel: 'Introvert (I)', leftPct: 88, rightPct: 12, dominantCode: 'E', dominantLabel: 'Ekstrovert (E)', clarityScore: 'Very Clear' },
-        SN: { leftCode: 'S', rightCode: 'N', leftLabel: 'Sensing (S)', rightLabel: 'Intuition (N)', leftPct: 25, rightPct: 75, dominantCode: 'N', dominantLabel: 'Intuition (N)', clarityScore: 'Very Clear' },
-        TF: { leftCode: 'T', rightCode: 'F', leftLabel: 'Thinking (T)', rightLabel: 'Feeling (F)', leftPct: 81, rightPct: 19, dominantCode: 'T', dominantLabel: 'Thinking (T)', clarityScore: 'Very Clear' },
-        JP: { leftCode: 'J', rightCode: 'P', leftLabel: 'Judging (J)', rightLabel: 'Perceiving (P)', leftPct: 94, rightPct: 6, dominantCode: 'J', dominantLabel: 'Judging (J)', clarityScore: 'Very Clear' }
-      },
-      completionTime: '2026-08-12T10:30:00Z'
-    },
-    answers: {},
-    createdAt: '2026-08-12',
-    timestamp: 1786530600000
-  },
-  {
-    id: 'SUB-SAMPLE-2',
-    user: {
-      fullName: 'Budi Santoso',
-      nik: 'DPP-2024-042',
-      position: 'Supervisor Maintenance',
-      department: 'Operasional Lapangan',
-      workArea: 'Workshop & Maintenance Yard',
-      email: 'budi.santoso@dianpandupratama.co.id'
-    },
-    result: {
-      code: 'ISTJ',
-      nickname: 'Logistik / Inspektur',
-      profile: MBTI_PROFILES['ISTJ'],
-      dimensions: {
-        EI: { leftCode: 'E', rightCode: 'I', leftLabel: 'Ekstrovert (E)', rightLabel: 'Introvert (I)', leftPct: 19, rightPct: 81, dominantCode: 'I', dominantLabel: 'Introvert (I)', clarityScore: 'Very Clear' },
-        SN: { leftCode: 'S', rightCode: 'N', leftLabel: 'Sensing (S)', rightLabel: 'Intuition (N)', leftPct: 88, rightPct: 12, dominantCode: 'S', dominantLabel: 'Sensing (S)', clarityScore: 'Very Clear' },
-        TF: { leftCode: 'T', rightCode: 'F', leftLabel: 'Thinking (T)', rightLabel: 'Feeling (F)', leftPct: 75, rightPct: 25, dominantCode: 'T', dominantLabel: 'Thinking (T)', clarityScore: 'Very Clear' },
-        JP: { leftCode: 'J', rightCode: 'P', leftLabel: 'Judging (J)', rightLabel: 'Perceiving (P)', leftPct: 88, rightPct: 12, dominantCode: 'J', dominantLabel: 'Judging (J)', clarityScore: 'Very Clear' }
-      },
-      completionTime: '2026-08-11T14:15:00Z'
-    },
-    answers: {},
-    createdAt: '2026-08-11',
-    timestamp: 1786457700000
-  },
-  {
-    id: 'SUB-SAMPLE-3',
-    user: {
-      fullName: 'Siti Rahmawati',
-      nik: 'DPP-2024-088',
-      position: 'HRD & Talent Specialist',
-      department: 'Human Capital',
-      workArea: 'Office / Administrasi Plant',
-      email: 'siti.rahma@dianpandupratama.co.id'
-    },
-    result: {
-      code: 'ENFJ',
-      nickname: 'Protagonis / Pemimpin Karismatik',
-      profile: MBTI_PROFILES['ENFJ'],
-      dimensions: {
-        EI: { leftCode: 'E', rightCode: 'I', leftLabel: 'Ekstrovert (E)', rightLabel: 'Introvert (I)', leftPct: 81, rightPct: 19, dominantCode: 'E', dominantLabel: 'Ekstrovert (E)', clarityScore: 'Very Clear' },
-        SN: { leftCode: 'S', rightCode: 'N', leftLabel: 'Sensing (S)', rightLabel: 'Intuition (N)', leftPct: 31, rightPct: 69, dominantCode: 'N', dominantLabel: 'Intuition (N)', clarityScore: 'Clear' },
-        TF: { leftCode: 'T', rightCode: 'F', leftLabel: 'Thinking (T)', rightLabel: 'Feeling (F)', leftPct: 12, rightPct: 88, dominantCode: 'F', dominantLabel: 'Feeling (F)', clarityScore: 'Very Clear' },
-        JP: { leftCode: 'J', rightCode: 'P', leftLabel: 'Judging (J)', rightLabel: 'Perceiving (P)', leftPct: 75, rightPct: 25, dominantCode: 'J', dominantLabel: 'Judging (J)', clarityScore: 'Very Clear' }
-      },
-      completionTime: '2026-08-10T09:00:00Z'
-    },
-    answers: {},
-    createdAt: '2026-08-10',
-    timestamp: 1786352400000
-  },
-  {
-    id: 'SUB-MT1AS0LW',
-    user: {
-      fullName: 'Hilmi Assidqi Aenudin Maksum',
-      nik: 'DPP-2024-105',
-      position: 'Operator Lapangan',
-      department: 'Operations & Production',
-      workArea: 'Plant Area / Processing Unit',
-      email: 'hilmiassidqi27@gmail.com'
-    },
-    result: {
-      code: 'ESFP',
-      nickname: 'Penghibur / Sosialis',
-      profile: MBTI_PROFILES['ESFP'],
-      dimensions: {
-        EI: { leftCode: 'E', rightCode: 'I', leftLabel: 'Ekstrovert (E)', rightLabel: 'Introvert (I)', leftPct: 59, rightPct: 41, dominantCode: 'E', dominantLabel: 'Ekstrovert (E)', clarityScore: 'Moderate' },
-        SN: { leftCode: 'S', rightCode: 'N', leftLabel: 'Sensing (S)', rightLabel: 'Intuition (N)', leftPct: 53, rightPct: 47, dominantCode: 'S', dominantLabel: 'Sensing (S)', clarityScore: 'Slight' },
-        TF: { leftCode: 'T', rightCode: 'F', leftLabel: 'Thinking (T)', rightLabel: 'Feeling (F)', leftPct: 28, rightPct: 72, dominantCode: 'F', dominantLabel: 'Feeling (F)', clarityScore: 'Very Clear' },
-        JP: { leftCode: 'J', rightCode: 'P', leftLabel: 'Judging (J)', rightLabel: 'Perceiving (P)', leftPct: 47, rightPct: 53, dominantCode: 'P', dominantLabel: 'Perceiving (P)', clarityScore: 'Slight' }
-      },
-      completionTime: '2026-08-20T16:07:00Z'
-    },
-    answers: {},
-    createdAt: '2026-08-20',
-    timestamp: 1787242020000
-  }
-];
+const INITIAL_DEMO_SUBMISSIONS: SubmissionRecord[] = [];
 
 export function getStoredSubmissions(): SubmissionRecord[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_DEMO_SUBMISSIONS));
-      return INITIAL_DEMO_SUBMISSIONS;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+      return [];
     }
     return JSON.parse(raw);
   } catch (err) {
     console.error('Failed to load submissions from localStorage:', err);
-    return INITIAL_DEMO_SUBMISSIONS;
+    return [];
   }
 }
 
