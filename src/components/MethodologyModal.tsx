@@ -71,37 +71,37 @@ export const MethodologyModal: React.FC<MethodologyModalProps> = ({
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className={`p-3.5 rounded-lg border ${isDarkMode ? 'border-slate-800 bg-slate-900/30' : 'border-slate-200 bg-white'}`}>
-                <div className="font-bold text-xs text-indigo-400 font-data-mono mb-1">
+                <div className={`font-bold text-xs font-data-mono mb-1 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
                   E vs I (Ekstrovert - Introvert)
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                   Preferensi fokus energi: Koordinasi langsung lintas shift dan relasi kontraktor (E) vs pemecahan masalah mendalam mandiri di ruang instrumen (I).
                 </p>
               </div>
 
               <div className={`p-3.5 rounded-lg border ${isDarkMode ? 'border-slate-800 bg-slate-900/30' : 'border-slate-200 bg-white'}`}>
-                <div className="font-bold text-xs text-emerald-400 font-data-mono mb-1">
+                <div className={`font-bold text-xs font-data-mono mb-1 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`}>
                   S vs N (Sensing - Intuition)
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                   Pengolahan fakta: Observasi parameter sensor riil & inspeksi fisik (S) vs perancangan pola inovasi dan retrofit sistem (N).
                 </p>
               </div>
 
               <div className={`p-3.5 rounded-lg border ${isDarkMode ? 'border-slate-800 bg-slate-900/30' : 'border-slate-200 bg-white'}`}>
-                <div className="font-bold text-xs text-amber-400 font-data-mono mb-1">
+                <div className={`font-bold text-xs font-data-mono mb-1 ${isDarkMode ? 'text-amber-400' : 'text-amber-600'}`}>
                   T vs F (Thinking - Feeling)
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                   Pengambilan keputusan krisis: Data metrik logis & spesifikasi teknis (T) vs iklim keharmonisan regu kerja & faktor manusia (F).
                 </p>
               </div>
 
               <div className={`p-3.5 rounded-lg border ${isDarkMode ? 'border-slate-800 bg-slate-900/30' : 'border-slate-200 bg-white'}`}>
-                <div className="font-bold text-xs text-sky-400 font-data-mono mb-1">
+                <div className={`font-bold text-xs font-data-mono mb-1 ${isDarkMode ? 'text-sky-400' : 'text-sky-600'}`}>
                   J vs P (Judging - Perceiving)
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
                   Struktur kerja: Kepatuhan ketat jadwal SOP & Permit to Work (J) vs ketangkasan improvisasi taktis kondisi site mendadak (P).
                 </p>
               </div>

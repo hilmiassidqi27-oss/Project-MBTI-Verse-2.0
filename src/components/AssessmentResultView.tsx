@@ -301,28 +301,32 @@ export const AssessmentResultView: React.FC<AssessmentResultViewProps> = ({
                   <span className="text-xs font-semibold text-indigo-400 uppercase tracking-wider font-label-caps">
                     {dim.axis}
                   </span>
-                  <span className="font-data-mono text-xs px-2 py-0.5 rounded bg-slate-800/60 text-slate-300 border border-slate-700">
+                  <span className={`font-data-mono text-xs px-2 py-0.5 rounded border ${
+                    isDarkMode ? 'bg-slate-800/60 text-slate-300 border-slate-700' : 'bg-slate-100 text-slate-700 border-slate-200'
+                  }`}>
                     {dim.dominant} ({dim.clarity})
                   </span>
                 </div>
 
                 {/* Dimension Labels & Percentages */}
                 <div className="flex justify-between items-center text-xs font-semibold mb-2">
-                  <span className={isLeftDominant ? 'text-emerald-400 font-bold' : isDarkMode ? 'text-slate-400' : 'text-slate-500'}>
+                  <span className={isLeftDominant ? (isDarkMode ? 'text-emerald-400 font-bold' : 'text-emerald-700 font-bold') : (isDarkMode ? 'text-slate-400' : 'text-slate-600')}>
                     {dim.leftLabel} : <span className="font-data-mono">{dim.leftPct}%</span>
                   </span>
-                  <span className={!isLeftDominant ? 'text-indigo-400 font-bold' : isDarkMode ? 'text-slate-400' : 'text-slate-500'}>
+                  <span className={!isLeftDominant ? (isDarkMode ? 'text-indigo-400 font-bold' : 'text-indigo-700 font-bold') : (isDarkMode ? 'text-slate-400' : 'text-slate-600')}>
                     <span className="font-data-mono">{dim.rightPct}%</span> : {dim.rightLabel}
                   </span>
                 </div>
 
                 {/* Visual Dual-Bar Track */}
-                <div className="w-full h-3 rounded-full bg-slate-800/80 overflow-hidden flex p-0.5 border border-slate-700/60">
+                <div className={`w-full h-3 rounded-full overflow-hidden flex p-0.5 border ${
+                  isDarkMode ? 'bg-slate-800/80 border-slate-700/60' : 'bg-slate-200 border-slate-300'
+                }`}>
                   <div
                     className={`h-full rounded-l-full transition-all duration-700 ${
                       isLeftDominant
                         ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'
-                        : 'bg-slate-700/60'
+                        : isDarkMode ? 'bg-slate-700/60' : 'bg-slate-300'
                     }`}
                     style={{ width: `${dim.leftPct}%` }}
                   />
@@ -330,7 +334,7 @@ export const AssessmentResultView: React.FC<AssessmentResultViewProps> = ({
                     className={`h-full rounded-r-full transition-all duration-700 ${
                       !isLeftDominant
                         ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]'
-                        : 'bg-slate-700/60'
+                        : isDarkMode ? 'bg-slate-700/60' : 'bg-slate-300'
                     }`}
                     style={{ width: `${dim.rightPct}%` }}
                   />
@@ -425,11 +429,17 @@ export const AssessmentResultView: React.FC<AssessmentResultViewProps> = ({
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-1.5 mt-auto pt-2 border-t border-slate-800/40">
+              <div className={`flex flex-wrap gap-1.5 mt-auto pt-2 border-t ${
+                isDarkMode ? 'border-slate-800/60' : 'border-slate-200'
+              }`}>
                 {career.keySkills.map((skill, si) => (
                   <span
                     key={si}
-                    className="text-[10px] font-data-mono px-2 py-0.5 rounded bg-slate-800/60 text-slate-300 border border-slate-700/50"
+                    className={`text-[10px] font-data-mono px-2 py-0.5 rounded border ${
+                      isDarkMode
+                        ? 'bg-slate-800/60 text-slate-300 border-slate-700/50'
+                        : 'bg-slate-100 text-slate-700 border-slate-200'
+                    }`}
                   >
                     {skill}
                   </span>

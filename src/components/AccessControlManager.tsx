@@ -380,7 +380,7 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                     <th className="py-3 px-4 text-right">Tindakan</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/40">
+                <tbody className={isDarkMode ? 'divide-y divide-slate-800/40' : 'divide-y divide-slate-200'}>
                   {filteredUsers.map(user => {
                     const isSelf = user.email.toLowerCase() === currentAdmin.email.toLowerCase();
                     return (
@@ -393,7 +393,9 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                         {/* Name & ID */}
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
-                            <div className="font-semibold text-slate-100 flex items-center gap-1.5">
+                            <div className={`font-semibold flex items-center gap-1.5 ${
+                              isDarkMode ? 'text-slate-100' : 'text-slate-900'
+                            }`}>
                               <span>{user.fullName}</span>
                               {isSelf && (
                                 <span className="text-[10px] px-1.5 py-0.2 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
@@ -402,11 +404,11 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                               )}
                             </div>
                           </div>
-                          <div className="font-data-mono text-[10px] text-slate-400">{user.id}</div>
+                          <div className={`font-data-mono text-[10px] ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{user.id}</div>
                         </td>
 
                         {/* Email */}
-                        <td className="py-3 px-4 font-data-mono text-slate-300">
+                        <td className={`py-3 px-4 font-data-mono ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                           {user.email}
                         </td>
 
@@ -428,9 +430,9 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                         </td>
 
                         {/* Department Scope */}
-                        <td className="py-3 px-4 text-slate-300">
+                        <td className={`py-3 px-4 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
                           {user.departmentScope === 'ALL' ? (
-                            <span className="text-emerald-400 font-medium">Semua Departemen Plant</span>
+                            <span className={isDarkMode ? 'text-emerald-400 font-medium' : 'text-emerald-600 font-semibold'}>Semua Departemen Plant</span>
                           ) : (
                             <span>{user.departmentScope}</span>
                           )}
@@ -443,8 +445,8 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                             disabled={!canManage || isSelf}
                             className={`inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded transition-all ${
                               user.status === 'active'
-                                ? 'text-emerald-400 hover:bg-emerald-500/10'
-                                : 'text-rose-400 hover:bg-rose-500/10'
+                                ? isDarkMode ? 'text-emerald-400 hover:bg-emerald-500/10' : 'text-emerald-600 hover:bg-emerald-50'
+                                : isDarkMode ? 'text-rose-400 hover:bg-rose-500/10' : 'text-rose-600 hover:bg-rose-50'
                             } ${!canManage || isSelf ? 'cursor-default' : 'cursor-pointer'}`}
                             title={canManage && !isSelf ? 'Klik untuk mengubah status' : undefined}
                           >
@@ -463,7 +465,7 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                         </td>
 
                         {/* Last Login */}
-                        <td className="py-3 px-4 text-slate-400 font-data-mono text-[11px]">
+                        <td className={`py-3 px-4 font-data-mono text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                           {user.lastLogin || 'Belum pernah'}
                         </td>
 
@@ -482,7 +484,9 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                                 {!isSelf && (
                                   <button
                                     onClick={() => handleDeleteUser(user)}
-                                    className="p-1.5 rounded hover:bg-rose-600/20 text-rose-400 transition-colors"
+                                    className={`p-1.5 rounded transition-colors ${
+                                      isDarkMode ? 'text-rose-400 hover:bg-rose-600/20' : 'text-rose-600 hover:bg-rose-50'
+                                    }`}
                                     title="Hapus Akses Petugas"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
@@ -532,41 +536,41 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                     <th className="py-2.5 px-3 text-center">Auditor</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/40">
+                <tbody className={isDarkMode ? 'divide-y divide-slate-800/40' : 'divide-y divide-slate-200'}>
                   <tr>
-                    <td className="py-3 px-3 font-medium text-slate-200">Melihat Data Semua Departemen Plant</td>
-                    <td className="py-3 px-3 text-center text-emerald-400 font-bold">✓ Penuh</td>
-                    <td className="py-3 px-3 text-center text-emerald-400 font-bold">✓ Penuh</td>
-                    <td className="py-3 px-3 text-center text-amber-400">Unit Tertentu</td>
-                    <td className="py-3 px-3 text-center text-emerald-400 font-bold">✓ Penuh</td>
+                    <td className={`py-3 px-3 font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>Melihat Data Semua Departemen Plant</td>
+                    <td className="py-3 px-3 text-center text-emerald-500 font-bold">✓ Penuh</td>
+                    <td className="py-3 px-3 text-center text-emerald-500 font-bold">✓ Penuh</td>
+                    <td className="py-3 px-3 text-center text-amber-500 font-medium">Unit Tertentu</td>
+                    <td className="py-3 px-3 text-center text-emerald-500 font-bold">✓ Penuh</td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-3 font-medium text-slate-200">Ekspor Laporan PDF & Rekap Excel 3 Sheet</td>
-                    <td className="py-3 px-3 text-center text-emerald-400 font-bold">✓ Ya</td>
-                    <td className="py-3 px-3 text-center text-emerald-400 font-bold">✓ Ya</td>
-                    <td className="py-3 px-3 text-center text-emerald-400 font-bold">✓ Ya</td>
-                    <td className="py-3 px-3 text-center text-rose-400">✗ Tidak</td>
+                    <td className={`py-3 px-3 font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>Ekspor Laporan PDF & Rekap Excel 3 Sheet</td>
+                    <td className="py-3 px-3 text-center text-emerald-500 font-bold">✓ Ya</td>
+                    <td className="py-3 px-3 text-center text-emerald-500 font-bold">✓ Ya</td>
+                    <td className="py-3 px-3 text-center text-emerald-500 font-bold">✓ Ya</td>
+                    <td className="py-3 px-3 text-center text-rose-500">✗ Tidak</td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-3 font-medium text-slate-200">Kelola Akun, Tambah Admin & Whitelist</td>
-                    <td className="py-3 px-3 text-center text-emerald-400 font-bold">✓ Ya</td>
-                    <td className="py-3 px-3 text-center text-rose-400">✗ Tidak</td>
-                    <td className="py-3 px-3 text-center text-rose-400">✗ Tidak</td>
-                    <td className="py-3 px-3 text-center text-rose-400">✗ Tidak</td>
+                    <td className={`py-3 px-3 font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>Kelola Akun, Tambah Admin & Whitelist</td>
+                    <td className="py-3 px-3 text-center text-emerald-500 font-bold">✓ Ya</td>
+                    <td className="py-3 px-3 text-center text-rose-500">✗ Tidak</td>
+                    <td className="py-3 px-3 text-center text-rose-500">✗ Tidak</td>
+                    <td className="py-3 px-3 text-center text-rose-500">✗ Tidak</td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-3 font-medium text-slate-200">Hapus Data Rekam Submisi Peserta</td>
-                    <td className="py-3 px-3 text-center text-emerald-400 font-bold">✓ Ya</td>
-                    <td className="py-3 px-3 text-center text-rose-400">✗ Tidak</td>
-                    <td className="py-3 px-3 text-center text-rose-400">✗ Tidak</td>
-                    <td className="py-3 px-3 text-center text-rose-400">✗ Tidak</td>
+                    <td className={`py-3 px-3 font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>Hapus Data Rekam Submisi Peserta</td>
+                    <td className="py-3 px-3 text-center text-emerald-500 font-bold">✓ Ya</td>
+                    <td className="py-3 px-3 text-center text-rose-500">✗ Tidak</td>
+                    <td className="py-3 px-3 text-center text-rose-500">✗ Tidak</td>
+                    <td className="py-3 px-3 text-center text-rose-500">✗ Tidak</td>
                   </tr>
                   <tr>
-                    <td className="py-3 px-3 font-medium text-slate-200">Simulasi Submisi Uji Coba Lapangan</td>
-                    <td className="py-3 px-3 text-center text-emerald-400 font-bold">✓ Ya</td>
-                    <td className="py-3 px-3 text-center text-rose-400">✗ Tidak</td>
-                    <td className="py-3 px-3 text-center text-rose-400">✗ Tidak</td>
-                    <td className="py-3 px-3 text-center text-rose-400">✗ Tidak</td>
+                    <td className={`py-3 px-3 font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>Simulasi Submisi Uji Coba Lapangan</td>
+                    <td className="py-3 px-3 text-center text-emerald-500 font-bold">✓ Ya</td>
+                    <td className="py-3 px-3 text-center text-rose-500">✗ Tidak</td>
+                    <td className="py-3 px-3 text-center text-rose-500">✗ Tidak</td>
+                    <td className="py-3 px-3 text-center text-rose-500">✗ Tidak</td>
                   </tr>
                 </tbody>
               </table>
@@ -583,48 +587,63 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
               isDarkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-sm'
             }`}
           >
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+            <div className={`p-4 border-b flex items-center justify-between ${
+              isDarkMode ? 'border-slate-800' : 'border-slate-200'
+            }`}>
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                <h3 className={`text-xs font-bold uppercase tracking-wider ${
+                  isDarkMode ? 'text-slate-300' : 'text-slate-800'
+                }`}>
                   Catatan Jejak Audit Keamanan (Security Audit Logs)
                 </h3>
-                <p className="text-[11px] text-slate-500 mt-0.5">
+                <p className={`text-[11px] mt-0.5 ${
+                  isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                }`}>
                   Setiap aktivitas login, modifikasi admin, penghapusan, dan ekspor data tercatat permanen.
                 </p>
               </div>
-              <span className="font-data-mono text-[11px] text-indigo-400">
+              <span className={`font-data-mono text-[11px] font-semibold ${
+                isDarkMode ? 'text-indigo-400' : 'text-indigo-600'
+              }`}>
                 {auditLogs.length} Catatan
               </span>
             </div>
 
-            <div className="divide-y divide-slate-800/40 max-h-[400px] overflow-y-auto">
+            <div className={`divide-y max-h-[400px] overflow-y-auto ${
+              isDarkMode ? 'divide-slate-800/40' : 'divide-slate-200'
+            }`}>
               {auditLogs.length === 0 ? (
                 <div className="p-8 text-center text-slate-500 text-xs">
                   Belum ada log aktivitas keamanan yang tercatat.
                 </div>
               ) : (
                 auditLogs.map(log => (
-                  <div key={log.id} className="p-3.5 hover:bg-slate-800/30 transition-colors flex items-start justify-between gap-4 text-xs">
+                  <div
+                    key={log.id}
+                    className={`p-3.5 transition-colors flex items-start justify-between gap-4 text-xs ${
+                      isDarkMode ? 'hover:bg-slate-800/30' : 'hover:bg-slate-50'
+                    }`}
+                  >
                     <div className="flex items-start gap-2.5">
                       <span
                         className={`px-2 py-0.5 rounded text-[10px] font-data-mono font-semibold border shrink-0 mt-0.5 ${
                           log.severity === 'critical'
-                            ? 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                            ? isDarkMode ? 'bg-rose-500/15 text-rose-300 border-rose-500/30' : 'bg-rose-50 text-rose-700 border-rose-200'
                             : log.severity === 'warning'
-                            ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
-                            : 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'
+                            ? isDarkMode ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' : 'bg-amber-50 text-amber-700 border-amber-200'
+                            : isDarkMode ? 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30' : 'bg-indigo-50 text-indigo-700 border-indigo-200'
                         }`}
                       >
                         {log.action}
                       </span>
                       <div>
-                        <div className="text-slate-200 font-medium">{log.details}</div>
-                        <div className="text-[11px] text-slate-500 font-data-mono mt-0.5">
-                          Pelaku: <span className="text-slate-400">{log.actorEmail}</span>
+                        <div className={`font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-900'}`}>{log.details}</div>
+                        <div className={`text-[11px] font-data-mono mt-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`}>
+                          Pelaku: <span className={isDarkMode ? 'text-slate-400' : 'text-slate-700'}>{log.actorEmail}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="text-[11px] text-slate-500 font-data-mono whitespace-nowrap">
+                    <div className={`text-[11px] font-data-mono whitespace-nowrap ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`}>
                       {log.timestamp}
                     </div>
                   </div>
@@ -647,23 +666,27 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                 isDarkMode ? 'bg-[#111b34] border-slate-700 text-slate-100' : 'bg-white border-slate-300 text-slate-900'
               }`}
             >
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-800">
+              <div className={`flex items-center justify-between mb-4 pb-3 border-b ${
+                isDarkMode ? 'border-slate-800' : 'border-slate-200'
+              }`}>
                 <div className="flex items-center gap-2">
-                  <KeyRound className="w-5 h-5 text-indigo-400" />
-                  <h3 className="text-base font-bold">
+                  <KeyRound className="w-5 h-5 text-indigo-500" />
+                  <h3 className={`text-base font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
                     {editingUser ? 'Ubah Hak Akses Petugas' : 'Tambah Otorisasi Petugas Baru'}
                   </h3>
                 </div>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                  className={`p-1 rounded-lg transition-colors ${
+                    isDarkMode ? 'text-slate-400 hover:text-white hover:bg-slate-800' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {formError && (
-                <div className="mb-4 p-3 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                <div className="mb-4 p-3 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{formError}</span>
                 </div>
@@ -671,7 +694,9 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
 
               <form onSubmit={handleSaveUser} className="space-y-4 text-xs">
                 <div>
-                  <label className="block font-semibold uppercase font-label-caps text-slate-300 mb-1">
+                  <label className={`block font-semibold uppercase font-label-caps mb-1 ${
+                    isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                  }`}>
                     Nama Lengkap Petugas
                   </label>
                   <input
@@ -687,7 +712,9 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                 </div>
 
                 <div>
-                  <label className="block font-semibold uppercase font-label-caps text-slate-300 mb-1">
+                  <label className={`block font-semibold uppercase font-label-caps mb-1 ${
+                    isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                  }`}>
                     Email Akun Administrator (Whitelist)
                   </label>
                   <input
@@ -699,7 +726,9 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                     placeholder="petugas@perusahaan.com"
                     className={`w-full p-2.5 rounded-lg border text-xs ${
                       editingUser
-                        ? 'opacity-60 cursor-not-allowed bg-slate-950 border-slate-800 text-slate-400'
+                        ? isDarkMode
+                          ? 'opacity-60 cursor-not-allowed bg-slate-950 border-slate-800 text-slate-400'
+                          : 'opacity-60 cursor-not-allowed bg-slate-100 border-slate-300 text-slate-500'
                         : isDarkMode
                         ? 'bg-slate-900 border-slate-700 text-white'
                         : 'bg-slate-50 border-slate-300 text-slate-900'
@@ -712,7 +741,9 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-semibold uppercase font-label-caps text-slate-300 mb-1">
+                    <label className={`block font-semibold uppercase font-label-caps mb-1 ${
+                      isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                    }`}>
                       Peran & Hak Akses
                     </label>
                     <select
@@ -730,7 +761,9 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
                   </div>
 
                   <div>
-                    <label className="block font-semibold uppercase font-label-caps text-slate-300 mb-1">
+                    <label className={`block font-semibold uppercase font-label-caps mb-1 ${
+                      isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                    }`}>
                       Cakupan Departemen
                     </label>
                     <select

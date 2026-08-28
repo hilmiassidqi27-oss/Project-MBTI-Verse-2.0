@@ -545,7 +545,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <th className="py-3.5 px-4 text-right">Tindakan</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/40">
+                <tbody className={isDarkMode ? 'divide-y divide-slate-800/40' : 'divide-y divide-slate-200'}>
                   {filteredSubmissions.length === 0 ? (
                     <tr>
                       <td colSpan={6} className="py-12 text-center text-slate-500">
@@ -562,17 +562,19 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       >
                         {/* Name & NIK */}
                         <td className="py-3.5 px-4">
-                          <div className="font-semibold text-slate-100">{sub.user.fullName}</div>
-                          <div className="font-data-mono text-[11px] text-slate-400">{sub.user.nik}</div>
+                          <div className={`font-semibold ${isDarkMode ? 'text-slate-100' : 'text-slate-900'}`}>{sub.user.fullName}</div>
+                          <div className={`font-data-mono text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{sub.user.nik}</div>
                         </td>
 
                         {/* Position, Department & Work Area */}
                         <td className="py-3.5 px-4">
-                          <div className="text-slate-200 font-medium">{sub.user.position}</div>
+                          <div className={`font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}>{sub.user.position}</div>
                           <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
-                            <span className="text-[11px] text-slate-400">{sub.user.department}</span>
+                            <span className={`text-[11px] ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{sub.user.department}</span>
                             {sub.user.workArea && (
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-indigo-300 border border-indigo-500/20">
+                              <span className={`text-[10px] px-1.5 py-0.2 rounded border ${
+                                isDarkMode ? 'bg-slate-800 text-indigo-300 border-indigo-500/20' : 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                              }`}>
                                 {sub.user.workArea}
                               </span>
                             )}
@@ -581,18 +583,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
                         {/* MBTI Code */}
                         <td className="py-3.5 px-4">
-                          <span className="px-2.5 py-1 rounded-md font-data-mono font-bold text-xs bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                          <span className={`px-2.5 py-1 rounded-md font-data-mono font-bold text-xs border ${
+                            isDarkMode ? 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30' : 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                          }`}>
                             {sub.result.code}
                           </span>
                         </td>
 
                         {/* Nickname */}
                         <td className="py-3.5 px-4">
-                          <span className="font-medium text-slate-300">&ldquo;{sub.result.nickname}&rdquo;</span>
+                          <span className={`font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>&ldquo;{sub.result.nickname}&rdquo;</span>
                         </td>
 
                         {/* Date */}
-                        <td className="py-3.5 px-4 font-data-mono text-slate-400">
+                        <td className={`py-3.5 px-4 font-data-mono ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                           {sub.createdAt}
                         </td>
 
@@ -621,8 +625,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             </button>
                             <button
                               onClick={() => setInspectingSubmission(sub)}
-                              className={`p-1.5 rounded hover:bg-slate-800 transition-colors ${
-                                isDarkMode ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+                              className={`p-1.5 rounded transition-colors ${
+                                isDarkMode ? 'text-slate-300 hover:bg-slate-800 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                               }`}
                               title="Lihat Detail Hasil di Layar"
                             >
@@ -631,7 +635,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             {permissions.canDeleteRecords && (
                               <button
                                 onClick={() => handleDelete(sub.id)}
-                                className="p-1.5 rounded text-rose-400 hover:bg-rose-950/30 transition-colors"
+                                className={`p-1.5 rounded transition-colors ${
+                                  isDarkMode ? 'text-rose-400 hover:bg-rose-950/30' : 'text-rose-600 hover:bg-rose-50'
+                                }`}
                                 title="Hapus Submisi"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -652,10 +658,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Modal for viewing inspected submission detail */}
       {inspectingSubmission && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
-          <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#0b1326] border border-slate-800 p-6">
+          <div className={`relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl border p-6 ${
+            isDarkMode ? 'bg-[#0b1326] border-slate-800 text-white' : 'bg-white border-slate-200 text-slate-900 shadow-2xl'
+          }`}>
             <button
               onClick={() => setInspectingSubmission(null)}
-              className="absolute top-4 right-4 p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+              className={`absolute top-4 right-4 p-2 rounded-lg transition-colors ${
+                isDarkMode ? 'bg-slate-800 text-slate-300 hover:text-white' : 'bg-slate-100 text-slate-600 hover:text-slate-900'
+              }`}
             >
               <X className="w-5 h-5" />
             </button>
