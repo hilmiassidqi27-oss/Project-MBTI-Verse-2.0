@@ -4,8 +4,15 @@ service cloud.firestore {
     match /submissions/{submissionId} {
       allow read, write: if true;
     }
+    match /admin_users/{userId} {
+      allow read, write: if true;
+    }
+    match /audit_logs/{logId} {
+      allow read, write: if true;
+    }
     match /{document=**} {
       allow read, write: if true;
     }
   }
 }
+

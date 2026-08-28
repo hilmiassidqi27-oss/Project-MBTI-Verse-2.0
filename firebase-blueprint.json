@@ -13,12 +13,52 @@
         "timestamp": { "type": "number", "description": "Timestamp in milliseconds" }
       },
       "required": ["id", "user", "result", "timestamp"]
+    },
+    "admin_users": {
+      "title": "Admin Users",
+      "description": "Authorized RBAC administrator accounts and role definitions",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Admin unique identifier" },
+        "email": { "type": "string", "description": "Admin user email" },
+        "fullName": { "type": "string", "description": "Admin full name" },
+        "role": { "type": "string", "description": "Assigned RBAC role" },
+        "departmentScope": { "type": "string", "description": "Scope of access" },
+        "status": { "type": "string", "description": "Account status (active or inactive)" },
+        "password": { "type": "string", "description": "Admin login password" },
+        "createdAt": { "type": "string", "description": "Account creation date" },
+        "lastLogin": { "type": "string", "description": "Timestamp of last successful login" },
+        "permissions": { "type": "object", "description": "Permissions map" }
+      },
+      "required": ["id", "email", "fullName", "role", "status"]
+    },
+    "audit_logs": {
+      "title": "Audit Logs",
+      "description": "System security and administrative action audit trails",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Audit log unique ID" },
+        "timestamp": { "type": "string", "description": "Formatted timestamp" },
+        "actorEmail": { "type": "string", "description": "Email of actor" },
+        "action": { "type": "string", "description": "Action type" },
+        "details": { "type": "string", "description": "Detailed log description" },
+        "severity": { "type": "string", "description": "Severity level (info, warning, critical)" }
+      },
+      "required": ["id", "timestamp", "actorEmail", "action", "details"]
     }
   },
   "firestore": {
     "submissions": {
-      "entity": "submissions",
+      "schema": "submissions",
       "description": "All assessment records synced across candidate mobile devices and admin dashboards"
+    },
+    "admin_users": {
+      "schema": "admin_users",
+      "description": "RBAC administrator user accounts synced across all devices"
+    },
+    "audit_logs": {
+      "schema": "audit_logs",
+      "description": "Security audit logs synced across all devices"
     }
   }
 }

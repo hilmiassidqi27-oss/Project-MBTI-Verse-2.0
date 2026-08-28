@@ -5,7 +5,10 @@ import {
   isFirebaseConfigured,
   saveSubmissionToFirestore,
   deleteSubmissionFromFirestore,
-  getSubmissionsFromFirestore
+  getSubmissionsFromFirestore,
+  saveAdminUserToFirestore,
+  deleteAdminUserFromFirestore,
+  saveAuditLogToFirestore
 } from '../services/firebase';
 
 const STORAGE_KEY = 'mbti_industrial_submissions_v2';
@@ -152,28 +155,34 @@ export function saveAdminUser(user: Omit<AdminUserRecord, 'id' | 'createdAt' | '
   const users = getStoredAdminUsers();
   const perms = ROLE_DEFINITIONS[user.role].permissions;
 
+  let savedRecord: AdminUserRecord;
+
   if (user.id) {
     // Update existing
-    const updated = users.map(u => {
-      if (u.id === user.id) {
-        return {
-          ...u,
-          fullName: user.fullName,
-          email: user.email.toLowerCase().trim(),
-          role: user.role,
-          departmentScope: user.departmentScope,
-          status: user.status,
-          password: user.password || u.password,
-          permissions: perms
-        };
-      }
-      return u;
-    });
+    savedRecord = {
+      id: user.id,
+      fullName: user.fullName,
+      email: user.email.toLowerCase().trim(),
+      role: user.role,
+      departmentScope: user.departmentScope,
+      status: user.status,
+      password: user.password || (users.find(u => u.id === user.id)?.password || 'admin123'),
+      createdAt: users.find(u => u.id === user.id)?.createdAt || new Date().toISOString().split('T')[0],
+      permissions: perms
+    };
+    const updated = users.map(u => (u.id === user.id ? savedRecord : u));
     localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(updated));
+
+    if (isFirebaseConfigured()) {
+      saveAdminUserToFirestore(savedRecord).catch(err => {
+        console.warn('Firestore admin save warning:', err);
+      });
+    }
+
     return updated;
   } else {
     // Create new
-    const newAdmin: AdminUserRecord = {
+    savedRecord = {
       id: `ADM-${Date.now().toString().slice(-4)}`,
       fullName: user.fullName,
       email: user.email.toLowerCase().trim(),
@@ -184,8 +193,15 @@ export function saveAdminUser(user: Omit<AdminUserRecord, 'id' | 'createdAt' | '
       createdAt: new Date().toISOString().split('T')[0],
       permissions: perms
     };
-    const updated = [newAdmin, ...users];
+    const updated = [savedRecord, ...users];
     localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(updated));
+
+    if (isFirebaseConfigured()) {
+      saveAdminUserToFirestore(savedRecord).catch(err => {
+        console.warn('Firestore admin save warning:', err);
+      });
+    }
+
     return updated;
   }
 }
@@ -193,12 +209,32 @@ export function saveAdminUser(user: Omit<AdminUserRecord, 'id' | 'createdAt' | '
 export function deleteAdminUser(id: string): AdminUserRecord[] {
   const users = getStoredAdminUsers().filter(u => u.id !== id);
   localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(users));
+
+  if (isFirebaseConfigured()) {
+    deleteAdminUserFromFirestore(id).catch(err => {
+      console.warn('Firestore admin delete warning:', err);
+    });
+  }
+
   return users;
 }
 
 export function updateAdminStatus(id: string, status: 'active' | 'inactive'): AdminUserRecord[] {
-  const users = getStoredAdminUsers().map(u => (u.id === id ? { ...u, status } : u));
-  localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(users));
+  const users = getStoredAdminUsers();
+  const target = users.find(u => u.id === id);
+  if (target) {
+    const updatedUser = { ...target, status };
+    const updated = users.map(u => (u.id === id ? updatedUser : u));
+    localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(updated));
+
+    if (isFirebaseConfigured()) {
+      saveAdminUserToFirestore(updatedUser).catch(err => {
+        console.warn('Firestore admin status update warning:', err);
+      });
+    }
+
+    return updated;
+  }
   return users;
 }
 
@@ -229,6 +265,13 @@ export function addAuditLog(
   };
   const updated = [newLog, ...logs.slice(0, 99)]; // retain latest 100 logs
   localStorage.setItem(AUDIT_LOGS_STORAGE_KEY, JSON.stringify(updated));
+
+  if (isFirebaseConfigured()) {
+    saveAuditLogToFirestore(newLog).catch(err => {
+      console.warn('Firestore audit log save warning:', err);
+    });
+  }
+
   return updated;
 }
 

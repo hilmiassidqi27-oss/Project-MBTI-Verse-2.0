@@ -1,6 +1,7 @@
 import React from 'react';
-import { Activity, ShieldCheck, Sun, Moon, HelpCircle, User, Sliders, LayoutDashboard, Lock, LogOut } from 'lucide-react';
+import { ShieldCheck, Sun, Moon, HelpCircle, User, Sliders, LayoutDashboard, Lock } from 'lucide-react';
 import { LikertUIStyle } from '../types';
+import { BrandLogo } from './BrandLogo';
 
 interface TopNavBarProps {
   currentView: 'register' | 'assessment' | 'result' | 'admin-login' | 'admin';
@@ -45,21 +46,21 @@ export const TopNavBar: React.FC<TopNavBarProps> = ({
         <div className="flex items-center gap-3">
           <button
             onClick={() => onNavigate('register')}
-            className="flex items-center gap-2.5 text-left group focus:outline-none"
+            className="flex items-center gap-3 text-left group focus:outline-none"
             id="brand-logo-button"
           >
             <div
-              className={`w-9 h-9 rounded-lg flex items-center justify-center border transition-all ${
+              className={`p-1 rounded-xl flex items-center justify-center border transition-all ${
                 isDarkMode
-                  ? 'bg-indigo-950/60 border-indigo-500/40 text-indigo-400 group-hover:border-indigo-400'
-                  : 'bg-indigo-50 border-indigo-200 text-indigo-600 group-hover:border-indigo-400'
+                  ? 'bg-slate-900/90 border-slate-800 group-hover:border-red-500/50 shadow-sm shadow-red-950/20'
+                  : 'bg-white border-slate-200 group-hover:border-red-400 shadow-sm'
               }`}
             >
-              <Activity className="w-5 h-5" />
+              <BrandLogo size="sm" />
             </div>
             <div>
               <div className={`font-bold tracking-tight text-base sm:text-lg leading-tight ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-                MBTI <span className={isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}>PT. Dian Pandu Pratama</span>
+                MBTI <span className={isDarkMode ? 'text-red-400' : 'text-red-600'}>PT. Dian Pandu Pratama</span>
               </div>
               <div className="text-[10px] tracking-wider uppercase font-data-mono text-slate-400 leading-none">
                 Asesmen Kepribadian

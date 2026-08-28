@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { authenticateAdmin, isFirebaseConfigured, AdminSession } from '../services/firebase';
+import { BrandLogo } from './BrandLogo';
 
 interface AdminLoginProps {
   onLoginSuccess: (session: AdminSession) => void;
@@ -96,8 +97,13 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({
 
         {/* Header Badge & Icon */}
         <div className="flex items-center justify-between mb-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 shadow-lg shadow-indigo-500/10">
-            <Lock className="w-6 h-6" />
+          <div className="flex items-center gap-3">
+            <div className="p-1.5 rounded-xl bg-slate-900/80 border border-slate-800 flex items-center justify-center shadow-md">
+              <BrandLogo size="sm" />
+            </div>
+            <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+              <Lock className="w-4 h-4" />
+            </div>
           </div>
 
           <div

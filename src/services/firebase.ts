@@ -4,6 +4,7 @@ import {
   collection,
   doc,
   setDoc,
+  getDoc,
   getDocs,
   deleteDoc,
   query,
@@ -13,11 +14,9 @@ import {
 import {
   getAuth,
   signInWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  User
+  signOut as firebaseSignOut
 } from 'firebase/auth';
-import { SubmissionRecord } from '../types';
+import { SubmissionRecord, AdminUserRecord, AuditLogRecord } from '../types';
 
 import firebaseAppletConfig from '../../firebase-applet-config.json';
 
@@ -80,7 +79,7 @@ export interface AdminSession {
 }
 
 /**
- * Perform Admin Login with RBAC verification, Whitelist checking, and fallback
+ * Perform Admin Login with RBAC verification from Cloud Firestore and Whitelist checking
  */
 export async function authenticateAdmin(email: string, pass: string): Promise<{ success: boolean; session?: AdminSession; error?: string }> {
   const trimmedEmail = email.trim().toLowerCase();
@@ -89,18 +88,32 @@ export async function authenticateAdmin(email: string, pass: string): Promise<{ 
     return { success: false, error: 'Email dan kata sandi wajib diisi.' };
   }
 
-  // Import dynamically or read from storage
-  let adminUsers: any[] = [];
-  try {
-    const rawUsers = localStorage.getItem('mbti_industrial_admin_users_v1');
-    if (rawUsers) {
-      adminUsers = JSON.parse(rawUsers);
+  // 1. Fetch latest Admin Users from Firestore or local cache
+  let adminUsers: AdminUserRecord[] = [];
+  if (db) {
+    try {
+      adminUsers = await getAdminUsersFromFirestore();
+      if (adminUsers.length > 0) {
+        localStorage.setItem('mbti_industrial_admin_users_v1', JSON.stringify(adminUsers));
+      }
+    } catch (err) {
+      console.warn('Error fetching admin users from Firestore:', err);
     }
-  } catch (err) {
-    console.warn('Error reading admin users:', err);
   }
 
-  // 1. Strict Whitelist Check
+  // Fallback to localStorage if empty
+  if (adminUsers.length === 0) {
+    try {
+      const rawUsers = localStorage.getItem('mbti_industrial_admin_users_v1');
+      if (rawUsers) {
+        adminUsers = JSON.parse(rawUsers);
+      }
+    } catch (err) {
+      console.warn('Error reading admin users from local storage:', err);
+    }
+  }
+
+  // 2. Strict Whitelist Check
   const authorizedUser = adminUsers.find(
     u => u.email.toLowerCase() === trimmedEmail
   );
@@ -109,18 +122,21 @@ export async function authenticateAdmin(email: string, pass: string): Promise<{ 
   if (!authorizedUser) {
     // Check if it's the root cloud admin or Hilmi (master admin)
     if (trimmedEmail !== 'admin@mbti-industrial.com' && trimmedEmail !== 'hilmiassidqi27@gmail.com') {
-      // Record failed attempt
+      // Record failed attempt in audit log
+      const failedLog: AuditLogRecord = {
+        id: `LOG-${Date.now().toString(36).toUpperCase()}`,
+        timestamp: new Date().toLocaleString('id-ID'),
+        actorEmail: trimmedEmail,
+        action: 'LOGIN',
+        details: 'Percobaan login ditolak: Email tidak terdaftar dalam whitelist otorisasi.',
+        severity: 'warning'
+      };
+
       try {
+        saveAuditLogToFirestore(failedLog);
         const rawLogs = localStorage.getItem('mbti_industrial_audit_logs_v1');
         const logs = rawLogs ? JSON.parse(rawLogs) : [];
-        logs.unshift({
-          id: `LOG-${Date.now().toString(36).toUpperCase()}`,
-          timestamp: new Date().toLocaleString('id-ID'),
-          actorEmail: trimmedEmail,
-          action: 'LOGIN',
-          details: 'Percobaan login ditolak: Email tidak terdaftar dalam whitelist otorisasi.',
-          severity: 'warning'
-        });
+        logs.unshift(failedLog);
         localStorage.setItem('mbti_industrial_audit_logs_v1', JSON.stringify(logs.slice(0, 99)));
       } catch {}
 
@@ -139,7 +155,7 @@ export async function authenticateAdmin(email: string, pass: string): Promise<{ 
     };
   }
 
-  // 2. If Firebase Auth is configured and active
+  // 3. If Firebase Auth is configured and active
   if (auth && isFirebaseConfigured()) {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, trimmedEmail, pass);
@@ -161,13 +177,23 @@ export async function authenticateAdmin(email: string, pass: string): Promise<{ 
         }
       };
       localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session));
+
+      // Record last login in Firestore
+      if (authorizedUser) {
+        const updatedUser: AdminUserRecord = {
+          ...authorizedUser,
+          lastLogin: new Date().toLocaleString('id-ID')
+        };
+        saveAdminUserToFirestore(updatedUser);
+      }
+
       return { success: true, session };
     } catch (err: any) {
-      console.warn('Firebase Auth error, checking fallback password matching:', err.message);
+      console.warn('Firebase Auth email/pass error, falling back to database password matching:', err.message);
     }
   }
 
-  // 3. Password Verification (Local/Gateway)
+  // 4. Password Verification (Database/Gateway)
   const expectedPassword = authorizedUser?.password || 'admin123';
   if (pass !== expectedPassword && pass !== 'admin123' && pass.length < 6) {
     return {
@@ -203,18 +229,30 @@ export async function authenticateAdmin(email: string, pass: string): Promise<{ 
 
   localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session));
 
+  // Update lastLogin in Firestore
+  if (authorizedUser) {
+    const updatedUser: AdminUserRecord = {
+      ...authorizedUser,
+      lastLogin: new Date().toLocaleString('id-ID')
+    };
+    saveAdminUserToFirestore(updatedUser);
+  }
+
   // Log successful login audit
+  const successLog: AuditLogRecord = {
+    id: `LOG-${Date.now().toString(36).toUpperCase()}`,
+    timestamp: new Date().toLocaleString('id-ID'),
+    actorEmail: trimmedEmail,
+    action: 'LOGIN',
+    details: `Login berhasil sebagai ${session.roleLabel} (Cakupan: ${session.departmentScope}).`,
+    severity: 'info'
+  };
+
   try {
+    saveAuditLogToFirestore(successLog);
     const rawLogs = localStorage.getItem('mbti_industrial_audit_logs_v1');
     const logs = rawLogs ? JSON.parse(rawLogs) : [];
-    logs.unshift({
-      id: `LOG-${Date.now().toString(36).toUpperCase()}`,
-      timestamp: new Date().toLocaleString('id-ID'),
-      actorEmail: trimmedEmail,
-      action: 'LOGIN',
-      details: `Login berhasil sebagai ${session.roleLabel} (Cakupan: ${session.departmentScope}).`,
-      severity: 'info'
-    });
+    logs.unshift(successLog);
     localStorage.setItem('mbti_industrial_audit_logs_v1', JSON.stringify(logs.slice(0, 99)));
   } catch {}
 
@@ -248,9 +286,10 @@ export async function logoutAdmin(): Promise<void> {
   }
 }
 
-/**
- * Save a submission record to Cloud Firestore
- */
+// -------------------------------------------------------------
+// FIRESTORE: SUBMISSIONS
+// -------------------------------------------------------------
+
 export async function saveSubmissionToFirestore(submission: SubmissionRecord): Promise<boolean> {
   if (!db) return false;
   try {
@@ -258,14 +297,11 @@ export async function saveSubmissionToFirestore(submission: SubmissionRecord): P
     await setDoc(docRef, submission);
     return true;
   } catch (err) {
-    console.error('Failed to save to Firestore:', err);
+    console.error('Failed to save submission to Firestore:', err);
     return false;
   }
 }
 
-/**
- * Fetch all submission records from Cloud Firestore
- */
 export async function getSubmissionsFromFirestore(): Promise<SubmissionRecord[]> {
   if (!db) return [];
   try {
@@ -277,28 +313,22 @@ export async function getSubmissionsFromFirestore(): Promise<SubmissionRecord[]>
     });
     return results;
   } catch (err) {
-    console.error('Failed to fetch from Firestore:', err);
+    console.error('Failed to fetch submissions from Firestore:', err);
     return [];
   }
 }
 
-/**
- * Delete a submission from Cloud Firestore
- */
 export async function deleteSubmissionFromFirestore(id: string): Promise<boolean> {
   if (!db) return false;
   try {
     await deleteDoc(doc(db, 'submissions', id));
     return true;
   } catch (err) {
-    console.error('Failed to delete from Firestore:', err);
+    console.error('Failed to delete submission from Firestore:', err);
     return false;
   }
 }
 
-/**
- * Subscribe to real-time updates from Firestore
- */
 export function subscribeToFirestoreSubmissions(
   onUpdate: (submissions: SubmissionRecord[]) => void
 ): () => void {
@@ -315,12 +345,139 @@ export function subscribeToFirestoreSubmissions(
         onUpdate(results);
       },
       error => {
-        console.warn('Firestore snapshot listener error:', error);
+        console.warn('Firestore submissions snapshot listener error:', error);
       }
     );
     return unsubscribe;
   } catch (err) {
-    console.warn('Could not setup Firestore listener:', err);
+    console.warn('Could not setup Firestore submissions listener:', err);
+    return () => {};
+  }
+}
+
+// -------------------------------------------------------------
+// FIRESTORE: ADMIN USERS (RBAC SYNC)
+// -------------------------------------------------------------
+
+export async function saveAdminUserToFirestore(user: AdminUserRecord): Promise<boolean> {
+  if (!db) return false;
+  try {
+    const docRef = doc(db, 'admin_users', user.id);
+    await setDoc(docRef, user);
+    return true;
+  } catch (err) {
+    console.error('Failed to save admin user to Firestore:', err);
+    return false;
+  }
+}
+
+export async function deleteAdminUserFromFirestore(id: string): Promise<boolean> {
+  if (!db) return false;
+  try {
+    await deleteDoc(doc(db, 'admin_users', id));
+    return true;
+  } catch (err) {
+    console.error('Failed to delete admin user from Firestore:', err);
+    return false;
+  }
+}
+
+export async function getAdminUsersFromFirestore(): Promise<AdminUserRecord[]> {
+  if (!db) return [];
+  try {
+    const snapshot = await getDocs(collection(db, 'admin_users'));
+    const results: AdminUserRecord[] = [];
+    snapshot.forEach(docSnap => {
+      results.push(docSnap.data() as AdminUserRecord);
+    });
+    return results;
+  } catch (err) {
+    console.error('Failed to fetch admin users from Firestore:', err);
+    return [];
+  }
+}
+
+export function subscribeToFirestoreAdminUsers(
+  onUpdate: (users: AdminUserRecord[]) => void
+): () => void {
+  if (!db) return () => {};
+  try {
+    const unsubscribe = onSnapshot(
+      collection(db, 'admin_users'),
+      snapshot => {
+        const results: AdminUserRecord[] = [];
+        snapshot.forEach(docSnap => {
+          results.push(docSnap.data() as AdminUserRecord);
+        });
+        if (results.length > 0) {
+          onUpdate(results);
+        }
+      },
+      error => {
+        console.warn('Firestore admin users snapshot listener error:', error);
+      }
+    );
+    return unsubscribe;
+  } catch (err) {
+    console.warn('Could not setup Firestore admin users listener:', err);
+    return () => {};
+  }
+}
+
+// -------------------------------------------------------------
+// FIRESTORE: AUDIT LOGS
+// -------------------------------------------------------------
+
+export async function saveAuditLogToFirestore(log: AuditLogRecord): Promise<boolean> {
+  if (!db) return false;
+  try {
+    const docRef = doc(db, 'audit_logs', log.id);
+    await setDoc(docRef, log);
+    return true;
+  } catch (err) {
+    console.error('Failed to save audit log to Firestore:', err);
+    return false;
+  }
+}
+
+export async function getAuditLogsFromFirestore(): Promise<AuditLogRecord[]> {
+  if (!db) return [];
+  try {
+    const snapshot = await getDocs(collection(db, 'audit_logs'));
+    const results: AuditLogRecord[] = [];
+    snapshot.forEach(docSnap => {
+      results.push(docSnap.data() as AuditLogRecord);
+    });
+    return results;
+  } catch (err) {
+    console.error('Failed to fetch audit logs from Firestore:', err);
+    return [];
+  }
+}
+
+export function subscribeToFirestoreAuditLogs(
+  onUpdate: (logs: AuditLogRecord[]) => void
+): () => void {
+  if (!db) return () => {};
+  try {
+    const unsubscribe = onSnapshot(
+      collection(db, 'audit_logs'),
+      snapshot => {
+        const results: AuditLogRecord[] = [];
+        snapshot.forEach(docSnap => {
+          results.push(docSnap.data() as AuditLogRecord);
+        });
+        if (results.length > 0) {
+          onUpdate(results);
+        }
+      },
+      error => {
+        console.warn('Firestore audit logs snapshot listener error:', error);
+      }
+    );
+    return unsubscribe;
+  } catch (err) {
+    console.warn('Could not setup Firestore audit logs listener:', err);
     return () => {};
   }
 }

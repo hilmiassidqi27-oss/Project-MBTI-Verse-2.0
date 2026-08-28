@@ -2,11 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { UserProfile, MBTIResult, SubmissionRecord, LikertUIStyle } from './types';
 import { INDUSTRIAL_QUESTIONS } from './data/questions';
 import { calculateMBTIResult } from './utils/scoring';
-import { getStoredSubmissions, saveSubmission } from './utils/storage';
+import { getStoredSubmissions, saveSubmission, getStoredAdminUsers } from './utils/storage';
 import {
   isFirebaseConfigured,
   subscribeToFirestoreSubmissions,
   saveSubmissionToFirestore,
+  subscribeToFirestoreAdminUsers,
+  saveAdminUserToFirestore,
+  subscribeToFirestoreAuditLogs,
   getActiveAdminSession,
   logoutAdmin,
   AdminSession
@@ -45,11 +48,12 @@ export function App() {
 
     // Subscribe to Firestore if configured
     if (isFirebaseConfigured()) {
-      const unsub = subscribeToFirestoreSubmissions(cloudRecords => {
+      // 1. Sync Submissions
+      const unsubSubmissions = subscribeToFirestoreSubmissions(cloudRecords => {
         if (cloudRecords && cloudRecords.length > 0) {
           setSubmissions(cloudRecords);
           try {
-            localStorage.setItem('mbti_industrial_submissions_v1', JSON.stringify(cloudRecords));
+            localStorage.setItem('mbti_industrial_submissions_v2', JSON.stringify(cloudRecords));
           } catch {}
         } else {
           // If Firestore is empty on fresh database setup, sync existing local records to Firestore
@@ -61,7 +65,38 @@ export function App() {
           }
         }
       });
-      return () => unsub();
+
+      // 2. Sync Admin Users across all devices
+      const unsubAdmins = subscribeToFirestoreAdminUsers(cloudAdmins => {
+        if (cloudAdmins && cloudAdmins.length > 0) {
+          try {
+            localStorage.setItem('mbti_industrial_admin_users_v1', JSON.stringify(cloudAdmins));
+          } catch {}
+        } else {
+          // If Firestore admin_users is empty, seed defaults
+          const defaultAdmins = getStoredAdminUsers();
+          if (defaultAdmins.length > 0) {
+            defaultAdmins.forEach(adm => {
+              saveAdminUserToFirestore(adm);
+            });
+          }
+        }
+      });
+
+      // 3. Sync Audit Logs across all devices
+      const unsubAudit = subscribeToFirestoreAuditLogs(cloudLogs => {
+        if (cloudLogs && cloudLogs.length > 0) {
+          try {
+            localStorage.setItem('mbti_industrial_audit_logs_v1', JSON.stringify(cloudLogs));
+          } catch {}
+        }
+      });
+
+      return () => {
+        unsubSubmissions();
+        unsubAdmins();
+        unsubAudit();
+      };
     }
   }, []);
 

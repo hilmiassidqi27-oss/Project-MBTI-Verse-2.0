@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { UserProfile } from '../types';
 import { INDUSTRIAL_DEPARTMENTS } from '../data/questions';
-import { User, BadgeCheck, Briefcase, Building2, Mail, ArrowRight, Activity, PlusCircle, MapPin } from 'lucide-react';
+import { User, BadgeCheck, Briefcase, Building2, Mail, ArrowRight, PlusCircle, MapPin } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { BrandLogo } from './BrandLogo';
 
 interface RegistrationFormProps {
   initialData?: UserProfile;
@@ -159,13 +160,13 @@ export const RegistrationForm: React.FC<RegistrationFormProps> = ({
         {/* Header Section */}
         <div className="text-center mb-8 sm:mb-10">
           <div
-            className={`inline-flex items-center justify-center w-16 h-16 rounded-xl border mb-5 shadow-sm transition-all ${
+            className={`inline-flex items-center justify-center p-3 rounded-2xl border mb-5 shadow-md transition-all ${
               isDarkMode
-                ? 'bg-indigo-950/70 border-indigo-500/30 text-indigo-400'
-                : 'bg-indigo-50 border-indigo-200 text-indigo-600'
+                ? 'bg-slate-900/90 border-slate-800 shadow-red-950/20'
+                : 'bg-white border-slate-200 shadow-slate-200/60'
             }`}
           >
-            <Activity className="w-8 h-8" />
+            <BrandLogo size="lg" />
           </div>
           <h1
             className={`text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-3 ${

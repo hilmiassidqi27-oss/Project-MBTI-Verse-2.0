@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AdminUserRecord,
   AdminRole,
@@ -13,7 +13,14 @@ import {
   addAuditLog,
   ROLE_DEFINITIONS
 } from '../utils/storage';
-import { AdminSession } from '../services/firebase';
+import {
+  AdminSession,
+  isFirebaseConfigured,
+  subscribeToFirestoreAdminUsers,
+  subscribeToFirestoreAuditLogs,
+  getAdminUsersFromFirestore,
+  getAuditLogsFromFirestore
+} from '../services/firebase';
 import { INDUSTRIAL_DEPARTMENTS } from '../data/questions';
 import {
   ShieldCheck,
@@ -54,6 +61,36 @@ export const AccessControlManager: React.FC<AccessControlManagerProps> = ({
   const [activeTab, setActiveTab] = useState<'users' | 'roles' | 'audit'>('users');
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('ALL');
+
+  // Real-time synchronization with Firestore across all PCs
+  useEffect(() => {
+    if (isFirebaseConfigured()) {
+      // 1. Subscribe to Admin Users
+      const unsubAdmins = subscribeToFirestoreAdminUsers(cloudAdmins => {
+        if (cloudAdmins && cloudAdmins.length > 0) {
+          setAdminUsers(cloudAdmins);
+          try {
+            localStorage.setItem('mbti_industrial_admin_users_v1', JSON.stringify(cloudAdmins));
+          } catch {}
+        }
+      });
+
+      // 2. Subscribe to Audit Logs
+      const unsubLogs = subscribeToFirestoreAuditLogs(cloudLogs => {
+        if (cloudLogs && cloudLogs.length > 0) {
+          setAuditLogs(cloudLogs);
+          try {
+            localStorage.setItem('mbti_industrial_audit_logs_v1', JSON.stringify(cloudLogs));
+          } catch {}
+        }
+      });
+
+      return () => {
+        unsubAdmins();
+        unsubLogs();
+      };
+    }
+  }, []);
 
   // Modal State for Add/Edit
   const [isModalOpen, setIsModalOpen] = useState(false);
