@@ -29,10 +29,10 @@ export const ROLE_DEFINITIONS: Record<AdminRole, { label: string; description: s
   },
   hr_specialist: {
     label: 'HRD & Psikolog Lapangan',
-    description: 'Akses seluruh submisi, ekspor PDF/Excel untuk rekrutmen/evaluasi, tanpa hak mengelola akun admin.',
+    description: 'Akses seluruh submisi, ekspor PDF/Excel untuk rekrutmen/evaluasi, serta penambahan & pengelolaan otorisasi petugas.',
     permissions: {
       canDeleteRecords: false,
-      canManageAdmins: false,
+      canManageAdmins: true,
       canExportData: true,
       canViewAllDepartments: true,
       canSimulateData: false
@@ -144,10 +144,96 @@ export function getStoredAdminUsers(): AdminUserRecord[] {
       localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(DEFAULT_ADMIN_USERS));
       return DEFAULT_ADMIN_USERS;
     }
-    return JSON.parse(raw);
+    const parsed: AdminUserRecord[] = JSON.parse(raw);
+    // Ensure default master admins are never lost across devices
+    const emailsInParsed = new Set(parsed.map(u => u.email.toLowerCase()));
+    const missingDefaults: AdminUserRecord[] = [];
+    DEFAULT_ADMIN_USERS.forEach(def => {
+      if (!emailsInParsed.has(def.email.toLowerCase())) {
+        missingDefaults.push(def);
+      }
+    });
+    if (missingDefaults.length > 0) {
+      const merged = [...parsed, ...missingDefaults];
+      try {
+        localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(merged));
+      } catch {}
+      return merged;
+    }
+    return parsed;
   } catch (err) {
     console.error('Failed to load admin users from storage:', err);
     return DEFAULT_ADMIN_USERS;
+  }
+}
+
+export async function saveAdminUserAsync(
+  user: Omit<AdminUserRecord, 'id' | 'createdAt' | 'permissions'> & { id?: string; permissions?: AdminRolePermissions }
+): Promise<{ success: boolean; users: AdminUserRecord[]; record: AdminUserRecord; error?: string }> {
+  const users = getStoredAdminUsers();
+  const perms = user.permissions || ROLE_DEFINITIONS[user.role].permissions;
+
+  let savedRecord: AdminUserRecord;
+
+  if (user.id) {
+    const existing = users.find(u => u.id === user.id);
+    savedRecord = {
+      id: user.id,
+      fullName: user.fullName.trim(),
+      email: user.email.toLowerCase().trim(),
+      role: user.role,
+      departmentScope: user.departmentScope,
+      status: user.status,
+      password: user.password || (existing?.password || 'admin123'),
+      createdAt: existing?.createdAt || new Date().toISOString().split('T')[0],
+      permissions: perms,
+      lastLogin: existing?.lastLogin || '-'
+    };
+    const updated = users.map(u => (u.id === user.id ? savedRecord : u));
+    localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(updated));
+
+    if (isFirebaseConfigured()) {
+      try {
+        const cloudSaved = await saveAdminUserToFirestore(savedRecord);
+        if (!cloudSaved) {
+          return { success: true, users: updated, record: savedRecord, error: 'Peringatan: Gagal menyinkronkan ke Cloud Firestore, data tersimpan di browser.' };
+        }
+      } catch (err: any) {
+        console.warn('Firestore admin save error:', err);
+        return { success: true, users: updated, record: savedRecord, error: err.message };
+      }
+    }
+    return { success: true, users: updated, record: savedRecord };
+  } else {
+    // Unique ID generation with 6 random characters
+    const uniqueSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+    savedRecord = {
+      id: `ADM-${Date.now().toString().slice(-4)}${uniqueSuffix}`,
+      fullName: user.fullName.trim(),
+      email: user.email.toLowerCase().trim(),
+      role: user.role,
+      departmentScope: user.departmentScope,
+      status: user.status,
+      password: user.password || 'admin123',
+      createdAt: new Date().toISOString().split('T')[0],
+      permissions: perms,
+      lastLogin: '-'
+    };
+    const updated = [savedRecord, ...users];
+    localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(updated));
+
+    if (isFirebaseConfigured()) {
+      try {
+        const cloudSaved = await saveAdminUserToFirestore(savedRecord);
+        if (!cloudSaved) {
+          return { success: true, users: updated, record: savedRecord, error: 'Peringatan: Gagal menyinkronkan ke Cloud Firestore, data tersimpan di browser.' };
+        }
+      } catch (err: any) {
+        console.warn('Firestore admin save error:', err);
+        return { success: true, users: updated, record: savedRecord, error: err.message };
+      }
+    }
+    return { success: true, users: updated, record: savedRecord };
   }
 }
 
@@ -159,16 +245,18 @@ export function saveAdminUser(user: Omit<AdminUserRecord, 'id' | 'createdAt' | '
 
   if (user.id) {
     // Update existing
+    const existing = users.find(u => u.id === user.id);
     savedRecord = {
       id: user.id,
-      fullName: user.fullName,
+      fullName: user.fullName.trim(),
       email: user.email.toLowerCase().trim(),
       role: user.role,
       departmentScope: user.departmentScope,
       status: user.status,
-      password: user.password || (users.find(u => u.id === user.id)?.password || 'admin123'),
-      createdAt: users.find(u => u.id === user.id)?.createdAt || new Date().toISOString().split('T')[0],
-      permissions: perms
+      password: user.password || (existing?.password || 'admin123'),
+      createdAt: existing?.createdAt || new Date().toISOString().split('T')[0],
+      permissions: perms,
+      lastLogin: existing?.lastLogin || '-'
     };
     const updated = users.map(u => (u.id === user.id ? savedRecord : u));
     localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(updated));
@@ -182,16 +270,18 @@ export function saveAdminUser(user: Omit<AdminUserRecord, 'id' | 'createdAt' | '
     return updated;
   } else {
     // Create new
+    const uniqueSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
     savedRecord = {
-      id: `ADM-${Date.now().toString().slice(-4)}`,
-      fullName: user.fullName,
+      id: `ADM-${Date.now().toString().slice(-4)}${uniqueSuffix}`,
+      fullName: user.fullName.trim(),
       email: user.email.toLowerCase().trim(),
       role: user.role,
       departmentScope: user.departmentScope,
       status: user.status,
       password: user.password || 'admin123',
       createdAt: new Date().toISOString().split('T')[0],
-      permissions: perms
+      permissions: perms,
+      lastLogin: '-'
     };
     const updated = [savedRecord, ...users];
     localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(updated));

@@ -220,12 +220,17 @@ export async function authenticateAdmin(email: string, pass: string): Promise<{ 
     isCloudAuth: false,
     permissions: authorizedUser?.permissions || {
       canDeleteRecords: role === 'super_admin',
-      canManageAdmins: role === 'super_admin',
+      canManageAdmins: role === 'super_admin' || role === 'hr_specialist',
       canExportData: role !== 'auditor',
       canViewAllDepartments: role !== 'plant_supervisor',
       canSimulateData: role === 'super_admin'
     }
   };
+
+  // Ensure canManageAdmins is true for super_admin and hr_specialist
+  if (role === 'super_admin' || role === 'hr_specialist') {
+    session.permissions.canManageAdmins = true;
+  }
 
   localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session));
 
@@ -266,7 +271,22 @@ export function getActiveAdminSession(): AdminSession | null {
   try {
     const raw = localStorage.getItem(ADMIN_SESSION_KEY);
     if (!raw) return null;
-    return JSON.parse(raw);
+    const session: AdminSession = JSON.parse(raw);
+    if (session) {
+      if (!session.permissions) {
+        session.permissions = {
+          canDeleteRecords: session.role === 'super_admin',
+          canManageAdmins: session.role === 'super_admin' || session.role === 'hr_specialist',
+          canExportData: session.role !== 'auditor',
+          canViewAllDepartments: session.role !== 'plant_supervisor',
+          canSimulateData: session.role === 'super_admin'
+        };
+      }
+      if (session.role === 'super_admin' || session.role === 'hr_specialist') {
+        session.permissions.canManageAdmins = true;
+      }
+    }
+    return session;
   } catch {
     return null;
   }
@@ -363,7 +383,25 @@ export async function saveAdminUserToFirestore(user: AdminUserRecord): Promise<b
   if (!db) return false;
   try {
     const docRef = doc(db, 'admin_users', user.id);
-    await setDoc(docRef, user);
+    const sanitized: Record<string, any> = {
+      id: user.id || `ADM-${Date.now().toString().slice(-4)}`,
+      fullName: user.fullName || '',
+      email: (user.email || '').toLowerCase().trim(),
+      role: user.role || 'super_admin',
+      departmentScope: user.departmentScope || 'ALL',
+      status: user.status || 'active',
+      password: user.password || 'admin123',
+      createdAt: user.createdAt || new Date().toISOString().split('T')[0],
+      lastLogin: user.lastLogin || '-',
+      permissions: user.permissions || {
+        canDeleteRecords: user.role === 'super_admin',
+        canManageAdmins: user.role === 'super_admin' || user.role === 'hr_specialist',
+        canExportData: user.role !== 'auditor',
+        canViewAllDepartments: user.role !== 'plant_supervisor',
+        canSimulateData: user.role === 'super_admin'
+      }
+    };
+    await setDoc(docRef, sanitized, { merge: true });
     return true;
   } catch (err) {
     console.error('Failed to save admin user to Firestore:', err);
