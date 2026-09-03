@@ -386,7 +386,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   {stats.total}
                 </span>
                 <span className="text-xs font-medium text-emerald-400 flex items-center">
-                  +100% Terverifikasi
+                  {stats.total > 0 ? '+100% Terverifikasi' : 'Siap Digunakan'}
                 </span>
               </div>
               <span className="text-[11px] text-slate-400 mt-1 block">
@@ -410,10 +410,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-extrabold text-emerald-400 font-data-mono">
-                  {stats.topType}
+                  {stats.total > 0 ? stats.topType : '-'}
                 </span>
                 <span className="text-xs text-slate-400 font-data-mono">
-                  {stats.topTypePct}% dari tim
+                  {stats.total > 0 ? `${stats.topTypePct}% dari tim` : '0% dari tim'}
                 </span>
               </div>
               <span className="text-[11px] text-slate-400 mt-1 block">Karakteristik dominan lapangan</span>
@@ -433,10 +433,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
               <div className="flex items-baseline gap-2">
                 <span className={`text-xl font-bold truncate ${isDarkMode ? 'text-white' : 'text-slate-900'}`} title={stats.topDept}>
-                  {stats.topDept}
+                  {stats.total > 0 ? stats.topDept : '-'}
                 </span>
               </div>
-              <span className="text-[11px] text-slate-400 mt-1 block">{stats.topDeptPct}% total submisi</span>
+              <span className="text-[11px] text-slate-400 mt-1 block">
+                {stats.total > 0 ? `${stats.topDeptPct}% total submisi` : '0 total submisi'}
+              </span>
             </div>
 
             {/* Metric 4: Compliance & Readiness */}
@@ -453,9 +455,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-extrabold text-indigo-400 font-data-mono">
-                  96.4%
+                  {stats.total > 0 ? '96.4%' : '-'}
                 </span>
-                <span className="text-xs font-medium text-emerald-400">Optimal</span>
+                <span className={`text-xs font-medium ${stats.total > 0 ? 'text-emerald-400' : 'text-slate-400'}`}>
+                  {stats.total > 0 ? 'Optimal' : 'Menunggu Data'}
+                </span>
               </div>
               <span className="text-[11px] text-slate-400 mt-1 block">Skor mitigasi risiko operasional</span>
             </div>
@@ -548,8 +552,50 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <tbody className={isDarkMode ? 'divide-y divide-slate-800/40' : 'divide-y divide-slate-200'}>
                   {filteredSubmissions.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="py-12 text-center text-slate-500">
-                        Tidak ada rekam submisi yang sesuai dengan kriteria filter.
+                      <td colSpan={6} className="py-16 px-4 text-center">
+                        <div className="max-w-md mx-auto flex flex-col items-center">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-3 ${
+                            isDarkMode ? 'bg-slate-800 text-slate-400 border border-slate-700' : 'bg-slate-100 text-slate-500 border border-slate-200'
+                          }`}>
+                            <Users className="w-6 h-6" />
+                          </div>
+                          <h4 className={`text-base font-bold mb-1 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+                            {submissions.length === 0 ? 'Belum Ada Rekam Submisi Peserta' : 'Tidak Ada Data Sesuai Filter'}
+                          </h4>
+                          <p className={`text-xs max-w-sm mb-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                            {submissions.length === 0
+                              ? 'Basis data asesmen telah bersih dan siap dikelola secara langsung. Bagikan tautan asesmen kepada kandidat atau karyawan plant untuk memulai pengumpulan data.'
+                              : 'Tidak ada peserta yang cocok dengan kata kunci pencarian atau filter departemen/MBTI yang dipilih.'}
+                          </p>
+                          {submissions.length === 0 ? (
+                            <button
+                              onClick={() => {
+                                const link = `${window.location.origin}${window.location.pathname}`;
+                                if (navigator.clipboard) {
+                                  navigator.clipboard.writeText(link);
+                                  alert('Tautan asesmen peserta berhasil disalin: ' + link);
+                                }
+                              }}
+                              className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold flex items-center gap-2 transition-all shadow-md active:scale-95"
+                            >
+                              <Share2 className="w-3.5 h-3.5" />
+                              <span>Salin Tautan Asesmen Peserta</span>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setSearchTerm('');
+                                setSelectedDept('ALL');
+                                setSelectedType('ALL');
+                              }}
+                              className={`px-3.5 py-1.5 rounded-lg border text-xs font-semibold transition-colors ${
+                                isDarkMode ? 'border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800' : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                              }`}
+                            >
+                              Reset Semua Filter
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ) : (

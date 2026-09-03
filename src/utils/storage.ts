@@ -78,7 +78,7 @@ const DEFAULT_ADMIN_USERS: AdminUserRecord[] = [
   {
     id: 'ADM-002',
     email: 'hilmiassidqi27@gmail.com',
-    fullName: 'Hilmi Assidqi (Lead Project)',
+    fullName: 'Hilmi Assidqi (Lead Project & Super Admin)',
     role: 'super_admin',
     departmentScope: 'ALL',
     status: 'active',
@@ -86,54 +86,6 @@ const DEFAULT_ADMIN_USERS: AdminUserRecord[] = [
     createdAt: '2024-01-10',
     lastLogin: '2024-10-24 10:00:00',
     permissions: ROLE_DEFINITIONS.super_admin.permissions
-  },
-  {
-    id: 'ADM-003',
-    email: 'hrd.recruitment@apex-ind.com',
-    fullName: 'Rina Setyowati, S.Psi',
-    role: 'hr_specialist',
-    departmentScope: 'ALL',
-    status: 'active',
-    password: 'hrd12345',
-    createdAt: '2024-02-15',
-    lastLogin: '2024-10-23 15:30:00',
-    permissions: ROLE_DEFINITIONS.hr_specialist.permissions
-  },
-  {
-    id: 'ADM-004',
-    email: 'plant.operations@apex-ind.com',
-    fullName: 'Ir. Hendra Gunawan',
-    role: 'plant_supervisor',
-    departmentScope: 'Plant Operations & Processing',
-    status: 'active',
-    password: 'plant123',
-    createdAt: '2024-03-01',
-    lastLogin: '2024-10-22 14:00:00',
-    permissions: ROLE_DEFINITIONS.plant_supervisor.permissions
-  },
-  {
-    id: 'ADM-005',
-    email: 'hse.lead@apex-ind.com',
-    fullName: 'Bambang Sudirman, ST',
-    role: 'plant_supervisor',
-    departmentScope: 'Health, Safety & Environment (HSE)',
-    status: 'active',
-    password: 'hse12345',
-    createdAt: '2024-03-05',
-    lastLogin: '2024-10-20 08:30:00',
-    permissions: ROLE_DEFINITIONS.plant_supervisor.permissions
-  },
-  {
-    id: 'ADM-006',
-    email: 'auditor.internal@apex-ind.com',
-    fullName: 'Kusuma Wardana, CIA',
-    role: 'auditor',
-    departmentScope: 'ALL',
-    status: 'active',
-    password: 'audit123',
-    createdAt: '2024-04-01',
-    lastLogin: '2024-10-18 11:20:00',
-    permissions: ROLE_DEFINITIONS.auditor.permissions
   }
 ];
 
@@ -145,22 +97,26 @@ export function getStoredAdminUsers(): AdminUserRecord[] {
       return DEFAULT_ADMIN_USERS;
     }
     const parsed: AdminUserRecord[] = JSON.parse(raw);
+    // Filter out obsolete dummy demo accounts from earlier development versions
+    const sanitized = parsed.filter(
+      u => !u.email.toLowerCase().endsWith('@apex-ind.com') && !u.email.toLowerCase().endsWith('@example.com')
+    );
     // Ensure default master admins are never lost across devices
-    const emailsInParsed = new Set(parsed.map(u => u.email.toLowerCase()));
+    const emailsInParsed = new Set(sanitized.map(u => u.email.toLowerCase()));
     const missingDefaults: AdminUserRecord[] = [];
     DEFAULT_ADMIN_USERS.forEach(def => {
       if (!emailsInParsed.has(def.email.toLowerCase())) {
         missingDefaults.push(def);
       }
     });
-    if (missingDefaults.length > 0) {
-      const merged = [...parsed, ...missingDefaults];
+    if (missingDefaults.length > 0 || sanitized.length !== parsed.length) {
+      const merged = [...sanitized, ...missingDefaults];
       try {
         localStorage.setItem(ADMIN_USERS_STORAGE_KEY, JSON.stringify(merged));
       } catch {}
       return merged;
     }
-    return parsed;
+    return sanitized;
   } catch (err) {
     console.error('Failed to load admin users from storage:', err);
     return DEFAULT_ADMIN_USERS;

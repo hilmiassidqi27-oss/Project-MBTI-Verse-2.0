@@ -48,22 +48,12 @@ export function App() {
 
     // Subscribe to Firestore if configured
     if (isFirebaseConfigured()) {
-      // 1. Sync Submissions
+      // 1. Sync Submissions directly from Firestore
       const unsubSubmissions = subscribeToFirestoreSubmissions(cloudRecords => {
-        if (cloudRecords && cloudRecords.length > 0) {
-          setSubmissions(cloudRecords);
-          try {
-            localStorage.setItem('mbti_industrial_submissions_v2', JSON.stringify(cloudRecords));
-          } catch {}
-        } else {
-          // If Firestore is empty on fresh database setup, sync existing local records to Firestore
-          const localRecords = getStoredSubmissions();
-          if (localRecords.length > 0) {
-            localRecords.forEach(rec => {
-              saveSubmissionToFirestore(rec);
-            });
-          }
-        }
+        setSubmissions(cloudRecords);
+        try {
+          localStorage.setItem('mbti_industrial_submissions_v2', JSON.stringify(cloudRecords));
+        } catch {}
       });
 
       // 2. Sync Admin Users across all devices
